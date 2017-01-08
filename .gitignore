@@ -22,3 +22,9 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+/bin
+/.go
+/.*-push
+/.*-container
+/.*-dockerfile
