@@ -34,7 +34,7 @@ REGISTRY ?= gcr.io/kuar-demo/kuard
 ARCH ?= amd64
 
 # Image to use for building.
-BUILD_IMAGE ?= golang:1.7-alpine
+BUILD_IMAGE ?= kuard-build
 
 # For demo purposes, we want to build multiple versions.  They will all be
 # mostly the same but will let us demonstrate rollouts.

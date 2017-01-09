@@ -49,6 +49,7 @@ PUSH_BUILDSTAMPS := \
   $(foreach BINARY,$(BINARIES),\
 	  $(foreach FAKEVER,$(FAKE_VERSIONS),\
 		  .$(BUILDSTAMP_NAME)-push))
+BUILD_IMAGE_BUILDSTAMP := .$(subst .,_,$(BUILD_IMAGE))-container
 
 ifeq ($(VERBOSE), 1)
 	DOCKER_BUILD_FLAGS :=
@@ -83,11 +84,20 @@ all-push: $(addprefix push-, $(ALL_ARCH))
 .PHONY: build
 build: $(GO_FAKEVER_BINARIES)
 
+$(BUILD_IMAGE_BUILDSTAMP): Dockerfile.build
+	@echo "container: $(BUILD_IMAGE)"
+	docker build                                                    \
+		$(DOCKER_BUILD_FLAGS)                                         \
+		-t $(BUILD_IMAGE)                                             \
+		-f Dockerfile.build .                                         \
+		$(VERBOSE_OUTPUT)
+	echo "$(BUILD_IMAGE)" > $@
+	docker images -q $(BUILD_IMAGE) >> $@
 
 # Rules for all bin/$(FAKEVER)/$(ARCH)/$(BINARY)
 GO_BINARIES = $(addprefix bin/$(FAKEVER)/$(ARCH)/,$(BINARIES))
 define GO_BINARIES_RULE
-$(GO_BINARIES): build-dirs
+$(GO_BINARIES): build-dirs $(BUILD_IMAGE_BUILDSTAMP)
 	@echo "building : $$@"
 	docker run                                                               \
 	    --sig-proxy=true                                                     \
@@ -135,7 +145,7 @@ define CONTAINER_RULE
 		-t $(CONTAINER_NAME):$(VERSION_BASE)-$(FAKEVER)               \
 		-f .$(BINARY)-$(ARCH)-$(FAKEVER)-dockerfile .                 \
 		$(VERBOSE_OUTPUT)
-	@echo "$(CONTAINER_NAME):$(VERSION_BASE)-$(FAKEVER)" > $$@
+	echo "$(CONTAINER_NAME):$(VERSION_BASE)-$(FAKEVER)" > $$@
 	docker images -q $(CONTAINER_NAME):$(VERSION_BASE)-$(FAKEVER) >> $$@
 endef
 $(foreach BINARY,$(BINARIES),\
@@ -171,7 +181,7 @@ push-names:
 
 # Rule for `test`
 .PHONY: test
-test: build-dirs
+test: build-dirs $(BUILD_IMAGE_BUILDSTAMP)
 	docker run                                                             \
 	    --sig-proxy=true                                                   \
 	    -u $$(id -u):$$(id -g)                                             \
