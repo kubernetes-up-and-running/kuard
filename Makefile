@@ -28,7 +28,7 @@ PKG := github.com/jbeda/kuard
 BINARIES := kuard
 
 # Registry to push to.
-REGISTRY ?= gcr.io/kuar-demo/kuard
+REGISTRY ?= gcr.io/kuar-demo
 
 # Default architecture to build for.
 ARCH ?= amd64
