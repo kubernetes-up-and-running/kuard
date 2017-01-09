@@ -18,6 +18,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"html/template"
 	"log"
@@ -31,11 +32,14 @@ import (
 	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/julienschmidt/httprouter"
 
+	"github.com/jbeda/kuard/pkg/debugsitedata"
 	"github.com/jbeda/kuard/pkg/sitedata"
 	"github.com/jbeda/kuard/pkg/version"
 )
 
-const serveAddr = ":8080"
+var serveAddr = flag.String("address", ":8080", "The address to serve on")
+var debug = flag.Bool("debug", false, "Debug/devel mode")
+var debugRootDir = flag.String("debug-sitedata-dir", "./sitedata", "When in debug/dev mode, directory to find the static assets.")
 
 func loggingMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +88,7 @@ func (k *kuard) rootHandler(w http.ResponseWriter, r *http.Request, _ httprouter
 }
 
 func (k *kuard) template(name string) *template.Template {
-	if k.t == nil {
+	if k.t == nil || *debug {
 		k.t = k.loadTemplates()
 	}
 	t := k.t.Lookup(name)
@@ -95,7 +99,14 @@ func (k *kuard) template(name string) *template.Template {
 }
 
 func (k *kuard) loadTemplates() *template.Template {
-	tFiles, err := sitedata.AssetDir("templates")
+	assetDir := sitedata.AssetDir
+	asset := sitedata.Asset
+	if *debug {
+		assetDir = debugsitedata.AssetDir
+		asset = debugsitedata.Asset
+	}
+
+	tFiles, err := assetDir("templates")
 	if err != nil {
 		panic(err)
 	}
@@ -104,7 +115,7 @@ func (k *kuard) loadTemplates() *template.Template {
 
 	for _, tFile := range tFiles {
 		fullName := path.Join("templates", tFile)
-		data, err := sitedata.Asset(fullName)
+		data, err := asset(fullName)
 		if err != nil {
 			continue
 		}
@@ -117,23 +128,40 @@ func (k *kuard) loadTemplates() *template.Template {
 	return t
 }
 
+func (k *kuard) addRoutes(router *httprouter.Router) {
+	// Add the root handler
+	router.GET("/", k.rootHandler)
+
+	// Add the static files
+	var fs http.FileSystem
+	if *debug {
+		fs = &assetfs.AssetFS{
+			Asset:     debugsitedata.Asset,
+			AssetDir:  func(path string) ([]string, error) { return nil, os.ErrNotExist },
+			AssetInfo: debugsitedata.AssetInfo,
+			Prefix:    "static",
+		}
+	} else {
+		fs = &assetfs.AssetFS{
+			Asset:     sitedata.Asset,
+			AssetDir:  func(path string) ([]string, error) { return nil, os.ErrNotExist },
+			AssetInfo: sitedata.AssetInfo,
+			Prefix:    "static",
+		}
+	}
+	router.Handler("GET", "/static/*filepath", http.StripPrefix("/static/", http.FileServer(fs)))
+}
+
 func main() {
+	flag.Parse()
+	debugsitedata.SetRootDir(*debugRootDir)
+
 	log.Printf("Starting kuard version: %v", version.VERSION)
 
 	app := kuard{}
-
 	router := httprouter.New()
-	router.Handler("GET", "/static/*filepath", http.StripPrefix("/static/",
-		http.FileServer(
-			&assetfs.AssetFS{
-				Asset:     sitedata.Asset,
-				AssetDir:  func(path string) ([]string, error) { return nil, os.ErrNotExist },
-				AssetInfo: sitedata.AssetInfo,
-				Prefix:    "static",
-			})))
+	app.addRoutes(router)
 
-	router.GET("/", app.rootHandler)
-
-	log.Printf("Serving on %v", serveAddr)
-	log.Fatal(http.ListenAndServe(serveAddr, loggingMiddleware(router)))
+	log.Printf("Serving on %v", *serveAddr)
+	log.Fatal(http.ListenAndServe(*serveAddr, loggingMiddleware(router)))
 }
