@@ -51,11 +51,12 @@ PUSH_BUILDSTAMPS := \
 		  .$(BUILDSTAMP_NAME)-push))
 BUILD_IMAGE_BUILDSTAMP := .$(subst .,_,$(BUILD_IMAGE))-container
 
+DOCKER_RUN_FLAGS := --rm
+DOCKER_BUILD_FLAGS := --rm
 ifeq ($(VERBOSE), 1)
-	DOCKER_BUILD_FLAGS :=
 	VERBOSE_OUTPUT := >&1
 else
-	DOCKER_BUILD_FLAGS := -q
+	DOCKER_BUILD_FLAGS += -q
 	VERBOSE_OUTPUT := >/dev/null
 	MAKEFLAGS += -s
 endif
@@ -100,6 +101,7 @@ define GO_BINARIES_RULE
 $(GO_BINARIES): build-dirs $(BUILD_IMAGE_BUILDSTAMP)
 	@echo "building : $$@"
 	docker run                                                               \
+	    $(DOCKER_RUN_FLAGS)                                                  \
 	    --sig-proxy=true                                                     \
 	    -u $$$$(id -u):$$$$(id -g)                                           \
 	    -v $$$$(pwd)/.go:/go                                                 \
@@ -183,6 +185,7 @@ push-names:
 .PHONY: test
 test: build-dirs $(BUILD_IMAGE_BUILDSTAMP)
 	docker run                                                             \
+	    $(DOCKER_RUN_FLAGS)                                                \
 	    --sig-proxy=true                                                   \
 	    -u $$(id -u):$$(id -g)                                             \
 	    -v $$(pwd)/.go:/go                                                 \
