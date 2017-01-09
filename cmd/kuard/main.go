@@ -49,9 +49,11 @@ func loggingMiddleware(handler http.Handler) http.Handler {
 }
 
 type pageContext struct {
-	Version     string
-	RequestDump string
-	Env         map[string]string
+	Version      string
+	RequestDump  string
+	RequestProto string
+	RequestAddr  string
+	Env          map[string]string
 }
 
 type kuard struct {
@@ -62,7 +64,9 @@ func (k *kuard) getPageContext(r *http.Request) *pageContext {
 	c := &pageContext{}
 	c.Version = version.VERSION
 	reqDump, _ := httputil.DumpRequest(r, false)
-	c.RequestDump = string(reqDump)
+	c.RequestDump = strings.TrimSpace(string(reqDump))
+	c.RequestProto = r.Proto
+	c.RequestAddr = r.RemoteAddr
 	c.Env = map[string]string{}
 	for _, e := range os.Environ() {
 		splits := strings.SplitN(e, "=", 2)

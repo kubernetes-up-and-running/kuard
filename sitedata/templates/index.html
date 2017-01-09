@@ -10,7 +10,33 @@
 </head>
 
 <body>
-  <h1>Kubernetes Up and Running</h1>
-  <div>Demo application version <i>{{.Version}}</i></div>
+  <div class="title">
+    <h1>Kubernetes Up and Running</h1>
+    <div>Demo application version <i>{{.Version}}</i></div>
+  </div>
+
+  <details open>
+    <summary>Request Details</summary>
+    <div class=content>
+      <div><b>Proto:</b> <code>{{.RequestProto}}</code></div>
+      <div><b>Client addr:</b> <code>{{.RequestAddr}}</code></div>
+      <div><b>Dump:</b></div>
+      <pre>
+        {{- .RequestDump -}}
+      </pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Environment</summary>
+    <div>
+      <table>
+      <tr><th>Key</th><th>Value</th>
+      {{range $k, $v := .Env}}
+        <TR><TD><CODE>{{$k}}</CODE></TD><TD><CODE>{{$v}}</CODE></TD></TR>
+      {{end}}
+      </table>
+    </div>
+  </details>
 </body>
 </html>

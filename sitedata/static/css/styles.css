@@ -2,3 +2,57 @@ body {
   font-size: 12pt;
   font-family: sans-serif;
 }
+
+.title {
+  text-align: center;
+  background-color: black;
+  color: white;
+  padding: 1em;
+}
+
+h2 {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+}
+
+pre {
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+}
+
+details {
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+  border: 1px solid #444;
+}
+
+details summary {
+  font-size: 1.4em;
+  color: white;
+  background-color: #444;
+  padding: 0.2em;
+}
+
+details > div {
+  padding: 0.5em;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table th {
+  background: #666;
+  color: white;
+  text-align: left;
+  padding: 0.2em;
+}
+
+table td {
+  border: 1px solid #999;
+  font-size: 0.8em;
+  padding: 0.2em;
+  word-break: break-all;
+}
