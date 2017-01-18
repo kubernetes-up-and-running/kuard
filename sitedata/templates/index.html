@@ -46,7 +46,41 @@
     </div>
   </details>
 
+  {{define "probe"}}
+  <div>
+    <p>Probe is being served on <a href="{{.BasePath}}">{{.BasePath}}</a></p>
+    <p>{{if eq .FailNext 0 }}Probe will permanently succeed
+       {{- else if gt .FailNext 0 }}Probe will fail for next {{.FailNext}} calls
+       {{- else}}Probe will permanently fail{{end}}
+    </p>
+    {{- if .History}}
+    <table>
+      <tr>
+        <th>When</th><th>&nbsp;</th><th>Status</th>
+      </tr>
+      {{- range .History }}
+      <tr>
+        <td>{{.When|friendlytime}}</td><td>{{.When|reltime}}</td><td>{{.Code}}</td>
+      </tr>
+      {{- end}}
+    </table>
+    {{- else}}
+    <p>No recorded probe history</p>
+    {{- end}}
+  </div>
+  {{end}}
+
   <details open>
+    <summary>Liveness Probe</summary>
+    {{template "probe" .Liveness}}
+  </details>
+
+  <details open>
+    <summary>Readiness Probe</summary>
+    {{template "probe" .Readiness}}
+  </details>
+
+  <details>
     <summary>File System</summary>
     <div>
       <a href="/fs/">Browse the root file system of this system</a>

@@ -39,7 +39,7 @@ func LoadTemplates(debug bool) *template.Template {
 		panic(err)
 	}
 
-	t := template.New("")
+	t := template.New("").Funcs(FuncMap())
 
 	for _, tFile := range tFiles {
 		fullName := path.Join("templates", tFile)

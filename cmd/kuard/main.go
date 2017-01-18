@@ -31,6 +31,7 @@ import (
 	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/julienschmidt/httprouter"
 
+	"github.com/jbeda/kuard/pkg/debugprobe"
 	"github.com/jbeda/kuard/pkg/debugsitedata"
 	"github.com/jbeda/kuard/pkg/htmlutils"
 	"github.com/jbeda/kuard/pkg/sitedata"
@@ -55,10 +56,16 @@ type pageContext struct {
 	RequestProto string
 	RequestAddr  string
 	Env          map[string]string
+
+	Liveness  *debugprobe.ProbeContext
+	Readiness *debugprobe.ProbeContext
 }
 
 type kuard struct {
 	t *template.Template
+
+	live  debugprobe.Probe
+	ready debugprobe.Probe
 }
 
 func (k *kuard) getPageContext(r *http.Request) *pageContext {
@@ -75,6 +82,9 @@ func (k *kuard) getPageContext(r *http.Request) *pageContext {
 		k, v := splits[0], splits[1]
 		c.Env[k] = v
 	}
+	c.Readiness = k.ready.GetContext()
+	c.Liveness = k.live.GetContext()
+
 	return c
 }
 
@@ -127,6 +137,9 @@ func (k *kuard) addRoutes(router *httprouter.Router) {
 	}
 	router.Handler("GET", "/static/*filepath", http.StripPrefix("/static/", http.FileServer(fs)))
 	router.Handler("GET", "/fs/*filepath", http.StripPrefix("/fs", http.FileServer(http.Dir("/"))))
+
+	k.live.AddRoutes("/healthy", router)
+	k.ready.AddRoutes("/ready", router)
 }
 
 func main() {
@@ -134,6 +147,10 @@ func main() {
 	debugsitedata.SetRootDir(*debugRootDir)
 
 	log.Printf("Starting kuard version: %v", version.VERSION)
+	log.Println(strings.Repeat("*", 70))
+	log.Println("* WARNING: This server may expose sensitive")
+	log.Println("* and secret information. Be careful.")
+	log.Println(strings.Repeat("*", 70))
 
 	app := kuard{}
 	router := httprouter.New()
