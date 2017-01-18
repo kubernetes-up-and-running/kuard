@@ -38,7 +38,7 @@ BUILD_IMAGE ?= kuard-build
 
 # For demo purposes, we want to build multiple versions.  They will all be
 # mostly the same but will let us demonstrate rollouts.
-FAKE_VERSIONS = a b c
+FAKE_VERSIONS = 1 2 3
 
 # This is the real version.  We'll grab it from git and use tags.
 VERSION_BASE ?= $(shell git describe --tags --always --dirty)
