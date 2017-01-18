@@ -141,13 +141,16 @@ $(foreach BINARY,$(BINARIES),\
 # Rules for containers
 define CONTAINER_RULE
 .$(BUILDSTAMP_NAME)-container: bin/$(FAKEVER)/$(ARCH)/$(BINARY)
-	@echo "container: $(CONTAINER_NAME):$(VERSION) (bin/$(ARCH)/$(BINARY))"
+	@echo "container: $(CONTAINER_NAME):$(VERSION_BASE)-$(FAKEVER) (bin/$(ARCH)/$(BINARY))"
 	docker build                                                    \
 		$(DOCKER_BUILD_FLAGS)                                         \
 		-t $(CONTAINER_NAME):$(VERSION_BASE)-$(FAKEVER)               \
 		-f .$(BINARY)-$(ARCH)-$(FAKEVER)-dockerfile .                 \
 		$(VERBOSE_OUTPUT)
 	echo "$(CONTAINER_NAME):$(VERSION_BASE)-$(FAKEVER)" > $$@
+	@echo "container: $(CONTAINER_NAME):$(FAKEVER) (bin/$(ARCH)/$(BINARY))"
+	docker tag $(CONTAINER_NAME):$(VERSION_BASE)-$(FAKEVER) $(CONTAINER_NAME):$(FAKEVER)
+	echo "$(CONTAINER_NAME):$(FAKEVER)" >> $$@
 	docker images -q $(CONTAINER_NAME):$(VERSION_BASE)-$(FAKEVER) >> $$@
 endef
 $(foreach BINARY,$(BINARIES),\
@@ -163,8 +166,10 @@ containers: $(CONTAINER_BUILDSTAMPS)
 push: $(PUSH_BUILDSTAMPS)
 
 .%-push: .%-container
-	@echo "pushing  :" $$(head -n 1 $<)
-	gcloud docker -- push $$(head -n 1 $<) $(VERBOSE_OUTPUT)
+	@echo "pushing  :" $$(sed -n '1p' $<)
+	gcloud docker -- push $$(sed -n '1p' $<) $(VERBOSE_OUTPUT)
+	@echo "pushing  :" $$(sed -n '2p' $<)
+	gcloud docker -- push $$(sed -n '2p' $<) $(VERBOSE_OUTPUT)
 	cat $< > $@
 
 define PUSH_RULE
@@ -178,7 +183,8 @@ $(foreach BINARY,$(BINARIES),\
 push-names:
 	@$(foreach BINARY,$(BINARIES),\
 	  $(foreach FAKEVER,$(FAKE_VERSIONS),\
-	    echo $(CONTAINER_NAME):$(VERSION_BASE)-$(FAKEVER);))
+	    echo $(CONTAINER_NAME):$(VERSION_BASE)-$(FAKEVER);\
+			echo $(CONTAINER_NAME):$(FAKEVER);))
 
 
 # Rule for `test`
