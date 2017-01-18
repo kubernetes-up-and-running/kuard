@@ -25,7 +25,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
-	"path"
 	"strconv"
 	"strings"
 
@@ -33,6 +32,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/jbeda/kuard/pkg/debugsitedata"
+	"github.com/jbeda/kuard/pkg/htmlutils"
 	"github.com/jbeda/kuard/pkg/sitedata"
 	"github.com/jbeda/kuard/pkg/version"
 )
@@ -50,6 +50,7 @@ func loggingMiddleware(handler http.Handler) http.Handler {
 
 type pageContext struct {
 	Version      string
+	VersionColor template.CSS
 	RequestDump  string
 	RequestProto string
 	RequestAddr  string
@@ -63,6 +64,7 @@ type kuard struct {
 func (k *kuard) getPageContext(r *http.Request) *pageContext {
 	c := &pageContext{}
 	c.Version = version.VERSION
+	c.VersionColor = template.CSS(htmlutils.ColorFromString(version.VERSION))
 	reqDump, _ := httputil.DumpRequest(r, false)
 	c.RequestDump = strings.TrimSpace(string(reqDump))
 	c.RequestProto = r.Proto
@@ -93,41 +95,11 @@ func (k *kuard) rootHandler(w http.ResponseWriter, r *http.Request, _ httprouter
 
 func (k *kuard) template(name string) *template.Template {
 	if k.t == nil || *debug {
-		k.t = k.loadTemplates()
+		k.t = htmlutils.LoadTemplates(*debug)
 	}
 	t := k.t.Lookup(name)
 	if t == nil {
 		panic(fmt.Sprintf("Could not load template %v", name))
-	}
-	return t
-}
-
-func (k *kuard) loadTemplates() *template.Template {
-	assetDir := sitedata.AssetDir
-	asset := sitedata.Asset
-	if *debug {
-		assetDir = debugsitedata.AssetDir
-		asset = debugsitedata.Asset
-	}
-
-	tFiles, err := assetDir("templates")
-	if err != nil {
-		panic(err)
-	}
-
-	t := template.New("")
-
-	for _, tFile := range tFiles {
-		fullName := path.Join("templates", tFile)
-		data, err := asset(fullName)
-		if err != nil {
-			continue
-		}
-		log.Printf("Loading template for %v", tFile)
-		_, err = t.New(tFile).Parse(string(data))
-		if err != nil {
-			log.Printf("ERROR: Could parse template %v: %v", tFile, err)
-		}
 	}
 	return t
 }
@@ -154,6 +126,7 @@ func (k *kuard) addRoutes(router *httprouter.Router) {
 		}
 	}
 	router.Handler("GET", "/static/*filepath", http.StripPrefix("/static/", http.FileServer(fs)))
+	router.Handler("GET", "/fs/*filepath", http.StripPrefix("/fs", http.FileServer(http.Dir("/"))))
 }
 
 func main() {

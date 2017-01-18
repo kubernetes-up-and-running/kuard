@@ -7,6 +7,11 @@
   <title>KUAR Demo</title>
 
   <link rel="stylesheet" href="/static/css/styles.css">
+  <style>
+    .title {
+      color: {{ .VersionColor }};
+    }
+  </style>
 </head>
 
 <body>
@@ -14,6 +19,8 @@
     <h1>Kubernetes Up and Running</h1>
     <div>Demo application version <i>{{.Version}}</i></div>
   </div>
+
+  <div class="warning">WARNING: This server may expose sensitive and secret information. Be careful.</div>
 
   <details open>
     <summary>Request Details</summary>
@@ -27,7 +34,7 @@
     </div>
   </details>
 
-  <details open>
+  <details>
     <summary>Environment</summary>
     <div>
       <table>
@@ -36,6 +43,13 @@
         <TR><TD><CODE>{{$k}}</CODE></TD><TD><CODE>{{$v}}</CODE></TD></TR>
       {{end}}
       </table>
+    </div>
+  </details>
+
+  <details open>
+    <summary>File System</summary>
+    <div>
+      <a href="/fs/">Browse the root file system of this system</a>
     </div>
   </details>
 </body>

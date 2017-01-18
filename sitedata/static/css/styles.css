@@ -10,6 +10,19 @@ body {
   padding: 1em;
 }
 
+.title h1 {
+  margin-top: 0;
+}
+
+.warning {
+  text-align: center;
+  color: red;
+  border: 3px solid red;
+  padding: 1em;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+}
+
 h2 {
   font-size: 1.2em;
   font-weight: bold;
