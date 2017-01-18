@@ -7,6 +7,10 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "github.com/dustin/go-humanize",
+			"Rev": "7a41df006ff9af79a29f0ffa9c5f21fbe6314a2d"
+		},
+		{
 			"ImportPath": "github.com/elazarl/go-bindata-assetfs",
 			"Rev": "9a6736ed45b44bf3835afeebb3034b57ed329f3e"
 		},
