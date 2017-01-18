@@ -58,10 +58,10 @@ type pageContext struct {
 }
 
 type kuard struct {
-	tg htmlutils.TemplateGroup
+	tg *htmlutils.TemplateGroup
 
-	live  debugprobe.Probe
-	ready debugprobe.Probe
+	live  *debugprobe.Probe
+	ready *debugprobe.Probe
 }
 
 func (k *kuard) getPageContext(r *http.Request) *pageContext {
@@ -112,8 +112,17 @@ func (k *kuard) addRoutes(router *httprouter.Router) {
 	router.Handler("GET", "/static/*filepath", http.StripPrefix("/static/", http.FileServer(fs)))
 	router.Handler("GET", "/fs/*filepath", http.StripPrefix("/fs", http.FileServer(http.Dir("/"))))
 
-	k.live.AddRoutes("/healthy", router)
-	k.ready.AddRoutes("/ready", router)
+	k.live.AddRoutes(router)
+	k.ready.AddRoutes(router)
+}
+
+func NewApp() *kuard {
+	k := &kuard{
+		tg: &htmlutils.TemplateGroup{},
+	}
+	k.live = debugprobe.New("/healthy", k.tg)
+	k.ready = debugprobe.New("/ready", k.tg)
+	return k
 }
 
 func main() {
@@ -126,7 +135,7 @@ func main() {
 	log.Println("* and secret information. Be careful.")
 	log.Println(strings.Repeat("*", 70))
 
-	app := kuard{}
+	app := NewApp()
 	router := httprouter.New()
 	app.addRoutes(router)
 

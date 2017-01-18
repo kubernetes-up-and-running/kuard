@@ -12,6 +12,8 @@
       color: {{ .VersionColor }};
     }
   </style>
+
+  <script src="/static/js/jquery-3.1.1.min.js"></script>
 </head>
 
 <body>
@@ -72,12 +74,12 @@
 
   <details open>
     <summary>Liveness Probe</summary>
-    {{template "probe" .Liveness}}
+    <div id=liveness></div>
   </details>
 
   <details open>
     <summary>Readiness Probe</summary>
-    {{template "probe" .Readiness }}
+    <div id=readiness></div>
   </details>
 
   <details>
@@ -86,5 +88,18 @@
       <a href="/fs/">Browse the root file system for this server.</a>
     </div>
   </details>
+  <script>
+    function renderLiveness() {
+      $("#liveness").load("{{.Liveness.BasePath}}/render")
+    }
+    renderLiveness()
+    setInterval(renderLiveness, 1000)
+
+    function renderReadiness() {
+      $("#readiness").load("{{.Readiness.BasePath}}/render")
+    }
+    renderReadiness()
+    setInterval(renderReadiness, 1000)
+  </script>
 </body>
 </html>

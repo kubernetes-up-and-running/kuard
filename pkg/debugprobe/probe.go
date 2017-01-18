@@ -23,6 +23,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jbeda/kuard/pkg/htmlutils"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -30,6 +31,8 @@ const maxHistory = 20
 
 type Probe struct {
 	mu sync.Mutex
+
+	tg *htmlutils.TemplateGroup
 
 	basePath string
 	// If failNext > 0, then fail next probe and decrement.  If failNext < 0, then
@@ -50,10 +53,17 @@ type ProbeContext struct {
 	History  []ProbeHistory
 }
 
-func (p *Probe) AddRoutes(base string, r *httprouter.Router) {
-	p.basePath = base
-	r.GET(base, p.Handle)
-	r.POST(base+"/config", p.Config)
+func New(base string, tg *htmlutils.TemplateGroup) *Probe {
+	return &Probe{
+		basePath: base,
+		tg:       tg,
+	}
+}
+
+func (p *Probe) AddRoutes(r *httprouter.Router) {
+	r.GET(p.basePath, p.Handle)
+	r.POST(p.basePath+"/config", p.Config)
+	r.GET(p.basePath+"/render", p.Render)
 }
 
 func (p *Probe) Handle(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -91,6 +101,10 @@ func (p *Probe) Config(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 		p.failNext = fail
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+func (p *Probe) Render(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	p.tg.Render(w, "probe.html", p.GetContext())
 }
 
 func (p *Probe) recordRequest(_ *http.Request, code int) {
