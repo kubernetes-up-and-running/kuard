@@ -17,20 +17,18 @@ limitations under the License.
 package main
 
 import (
-	"bytes"
 	"flag"
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/julienschmidt/httprouter"
 
+	"github.com/jbeda/kuard/pkg/config"
 	"github.com/jbeda/kuard/pkg/debugprobe"
 	"github.com/jbeda/kuard/pkg/debugsitedata"
 	"github.com/jbeda/kuard/pkg/htmlutils"
@@ -39,8 +37,6 @@ import (
 )
 
 var serveAddr = flag.String("address", ":8080", "The address to serve on")
-var debug = flag.Bool("debug", false, "Debug/devel mode")
-var debugRootDir = flag.String("debug-sitedata-dir", "./sitedata", "When in debug/dev mode, directory to find the static assets.")
 
 func loggingMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +58,7 @@ type pageContext struct {
 }
 
 type kuard struct {
-	t *template.Template
+	tg htmlutils.TemplateGroup
 
 	live  debugprobe.Probe
 	ready debugprobe.Probe
@@ -89,29 +85,7 @@ func (k *kuard) getPageContext(r *http.Request) *pageContext {
 }
 
 func (k *kuard) rootHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	t := k.template("index.html")
-	buf := &bytes.Buffer{}
-	err := t.Execute(buf, k.getPageContext(r))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "text/html")
-	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
-	w.WriteHeader(http.StatusOK)
-	buf.WriteTo(w)
-}
-
-func (k *kuard) template(name string) *template.Template {
-	if k.t == nil || *debug {
-		k.t = htmlutils.LoadTemplates(*debug)
-	}
-	t := k.t.Lookup(name)
-	if t == nil {
-		panic(fmt.Sprintf("Could not load template %v", name))
-	}
-	return t
+	k.tg.Render(w, "index.html", k.getPageContext(r))
 }
 
 func (k *kuard) addRoutes(router *httprouter.Router) {
@@ -120,7 +94,7 @@ func (k *kuard) addRoutes(router *httprouter.Router) {
 
 	// Add the static files
 	var fs http.FileSystem
-	if *debug {
+	if *config.Debug {
 		fs = &assetfs.AssetFS{
 			Asset:     debugsitedata.Asset,
 			AssetDir:  func(path string) ([]string, error) { return nil, os.ErrNotExist },
@@ -144,7 +118,7 @@ func (k *kuard) addRoutes(router *httprouter.Router) {
 
 func main() {
 	flag.Parse()
-	debugsitedata.SetRootDir(*debugRootDir)
+	debugsitedata.SetRootDir(*config.DebugRootDir)
 
 	log.Printf("Starting kuard version: %v", version.VERSION)
 	log.Println(strings.Repeat("*", 70))

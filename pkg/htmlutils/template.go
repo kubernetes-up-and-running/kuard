@@ -17,19 +17,54 @@ limitations under the License.
 package htmlutils
 
 import (
+	"bytes"
+	"fmt"
 	"html/template"
 	"log"
+	"net/http"
 	"path"
+	"strconv"
 
+	"github.com/jbeda/kuard/pkg/config"
 	"github.com/jbeda/kuard/pkg/debugsitedata"
 	"github.com/jbeda/kuard/pkg/sitedata"
 )
 
+type TemplateGroup struct {
+	t *template.Template
+}
+
+func (g *TemplateGroup) Render(w http.ResponseWriter, name string, context interface{}) {
+	t := g.GetTemplate(name)
+	buf := &bytes.Buffer{}
+	err := t.Execute(buf, context)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
+	w.WriteHeader(http.StatusOK)
+	buf.WriteTo(w)
+}
+
+func (g *TemplateGroup) GetTemplate(name string) *template.Template {
+	if g.t == nil || *config.Debug {
+		g.t = g.LoadTemplates()
+	}
+	t := g.t.Lookup(name)
+	if t == nil {
+		panic(fmt.Sprintf("Could not load template %v", name))
+	}
+	return t
+}
+
 // LoadTemplates loads the templates for our toy server
-func LoadTemplates(debug bool) *template.Template {
+func (g *TemplateGroup) LoadTemplates() *template.Template {
 	assetDir := sitedata.AssetDir
 	asset := sitedata.Asset
-	if debug {
+	if *config.Debug {
 		assetDir = debugsitedata.AssetDir
 		asset = debugsitedata.Asset
 	}
