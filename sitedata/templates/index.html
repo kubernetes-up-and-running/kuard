@@ -90,13 +90,29 @@
   </details>
   <script>
     function renderLiveness() {
-      $("#liveness").load("{{.Liveness.BasePath}}/render")
+      $("#liveness").load("{{.Liveness.BasePath}}/render", wireLiveness)
+    }
+    function wireLiveness() {
+      $("#liveness .failn").click(function(){
+        var n = this.getAttribute("n")
+        $.post("{{.Liveness.BasePath}}/config?fail="+n)
+        renderLiveness()
+        return false
+      })
     }
     renderLiveness()
     setInterval(renderLiveness, 1000)
 
     function renderReadiness() {
-      $("#readiness").load("{{.Readiness.BasePath}}/render")
+      $("#readiness").load("{{.Readiness.BasePath}}/render", wireReadiness)
+    }
+    function wireReadiness() {
+      $("#readiness .failn").click(function(){
+        var n = this.getAttribute("n")
+        $.post("{{.Readiness.BasePath}}/config?fail="+n)
+        renderReadiness()
+        return false
+      })
     }
     renderReadiness()
     setInterval(renderReadiness, 1000)

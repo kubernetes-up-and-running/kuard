@@ -2,7 +2,18 @@
   <p>Probe is being served on <a href="{{.BasePath}}">{{.BasePath}}</a></p>
   <p>{{if eq .FailNext 0 }}Probe will permanently succeed
      {{- else if gt .FailNext 0 }}Probe will fail for next {{.FailNext}} calls
-     {{- else}}Probe will permanently fail{{end}}
+     {{- else}}Probe will permanently fail{{end}}<br>
+     <span class=small>
+       <a class="failn" n=0  href="#">Succeed</a> |
+       <a class="failn" n=-1 href="#">Fail</a> |
+       Fail for next N calls:
+       <a class="failn" n=1  href="#">1</a>
+       <a class="failn" n=2  href="#">2</a>
+       <a class="failn" n=3  href="#">3</a>
+       <a class="failn" n=4  href="#">4</a>
+       <a class="failn" n=5  href="#">5</a>
+       <a class="failn" n=10 href="#">10</a>
+    </span>
   </p>
   {{- if .History}}
   <table>

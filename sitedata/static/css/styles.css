@@ -70,3 +70,11 @@ table td {
   padding: 0.2em;
   word-break: break-all;
 }
+
+.small {
+  font-size: 0.75em;
+}
+
+#failcount {
+  width: 5em;
+}
