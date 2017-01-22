@@ -72,6 +72,8 @@
   </div>
   {{end}}
 
+  <div id="test"></div>
+
   <details open>
     <summary>Liveness Probe</summary>
     <div id=liveness></div>
@@ -88,6 +90,7 @@
       <a href="/fs/">Browse the root file system for this server.</a>
     </div>
   </details>
+  <script src="built/bundle.js" type="text/javascript"></script>
   <script>
     function renderLiveness() {
       $("#liveness").load("{{.Liveness.BasePath}}/render", wireLiveness)
