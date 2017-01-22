@@ -17,12 +17,14 @@ limitations under the License.
 package debugprobe
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
 
+	"github.com/jbeda/kuard/pkg/apiutils"
 	"github.com/jbeda/kuard/pkg/htmlutils"
 	"github.com/julienschmidt/httprouter"
 )
@@ -64,6 +66,46 @@ func (p *Probe) AddRoutes(r *httprouter.Router) {
 	r.GET(p.basePath, p.Handle)
 	r.POST(p.basePath+"/config", p.Config)
 	r.GET(p.basePath+"/render", p.Render)
+
+	r.GET(p.basePath+"/api", p.APIGet)
+	r.PUT(p.basePath+"/api", p.APIPut)
+}
+
+func (p *Probe) APIGet(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	s := &ProbeStatus{
+		ProbePath: p.basePath,
+		FailNext:  p.failNext,
+	}
+	l := len(p.history)
+	s.History = make([]ProbeStatusHistory, l)
+	for i, v := range p.history {
+		h := &s.History[l-1-i]
+		h.When = htmlutils.FriendlyTime(v.When)
+		h.RelWhen = htmlutils.RelativeTime(v.When)
+		h.Code = v.Code
+	}
+
+	apiutils.ServeJSON(w, s)
+}
+
+func (p *Probe) APIPut(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	c := &ProbeConfig{}
+
+	err := json.NewDecoder(r.Body).Decode(c)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	p.failNext = c.FailNext
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (p *Probe) Handle(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
