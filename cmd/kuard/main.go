@@ -47,11 +47,11 @@ func loggingMiddleware(handler http.Handler) http.Handler {
 }
 
 type pageContext struct {
-	Version      string
-	VersionColor template.CSS
-	RequestDump  string
-	RequestProto string
-	RequestAddr  string
+	Version      string       `json:"version"`
+	VersionColor template.CSS `json:"versionColor"`
+	RequestDump  string       `json:"requestDump"`
+	RequestProto string       `json:"requestProto"`
+	RequestAddr  string       `json:"requestAddr"`
 }
 
 type kuard struct {
@@ -74,6 +74,26 @@ func (k *kuard) rootHandler(w http.ResponseWriter, r *http.Request, _ httprouter
 	k.tg.Render(w, "index.html", k.getPageContext(r))
 }
 
+func fsHandlerForPrefix(prefix string) http.Handler {
+	var fs http.FileSystem
+	if *config.Debug {
+		fs = &assetfs.AssetFS{
+			Asset:     debugsitedata.Asset,
+			AssetDir:  func(path string) ([]string, error) { return nil, os.ErrNotExist },
+			AssetInfo: debugsitedata.AssetInfo,
+			Prefix:    prefix,
+		}
+	} else {
+		fs = &assetfs.AssetFS{
+			Asset:     sitedata.Asset,
+			AssetDir:  func(path string) ([]string, error) { return nil, os.ErrNotExist },
+			AssetInfo: sitedata.AssetInfo,
+			Prefix:    prefix,
+		}
+	}
+	return http.StripPrefix("/"+prefix+"/", http.FileServer(fs))
+}
+
 func NewApp(router *httprouter.Router) *kuard {
 	k := &kuard{
 		tg: &htmlutils.TemplateGroup{},
@@ -83,23 +103,9 @@ func NewApp(router *httprouter.Router) *kuard {
 	router.GET("/", k.rootHandler)
 
 	// Add the static files
-	var fs http.FileSystem
-	if *config.Debug {
-		fs = &assetfs.AssetFS{
-			Asset:     debugsitedata.Asset,
-			AssetDir:  func(path string) ([]string, error) { return nil, os.ErrNotExist },
-			AssetInfo: debugsitedata.AssetInfo,
-			Prefix:    "static",
-		}
-	} else {
-		fs = &assetfs.AssetFS{
-			Asset:     sitedata.Asset,
-			AssetDir:  func(path string) ([]string, error) { return nil, os.ErrNotExist },
-			AssetInfo: sitedata.AssetInfo,
-			Prefix:    "static",
-		}
-	}
-	router.Handler("GET", "/static/*filepath", http.StripPrefix("/static/", http.FileServer(fs)))
+	router.Handler("GET", "/built/*filepath", fsHandlerForPrefix("built"))
+	router.Handler("GET", "/static/*filepath", fsHandlerForPrefix("static"))
+
 	router.Handler("GET", "/fs/*filepath", http.StripPrefix("/fs", http.FileServer(http.Dir("/"))))
 
 	debugprobe.New("/healthy").AddRoutes(router)

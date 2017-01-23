@@ -12,33 +12,13 @@
       color: {{ .VersionColor }};
     }
   </style>
+  <script>
+var pageContext = {{ . | jsonstring }}
+  </script>
 </head>
 
 <body>
-  <div class="title">
-    <h1>Kubernetes Up and Running</h1>
-    <div>Demo application version <i>{{.Version}}</i></div>
-  </div>
-
-  <div class="warning">WARNING: This server may expose sensitive and secret information. Be careful.</div>
-
-  <details open>
-    <summary>Request Details</summary>
-    <div class=content>
-      <div><b>Proto:</b> <code>{{.RequestProto}}</code></div>
-      <div><b>Client addr:</b> <code>{{.RequestAddr}}</code></div>
-      <div><b>Dump:</b></div>
-      <pre>
-        {{- .RequestDump -}}
-      </pre>
-    </div>
-  </details>
-
-  <div id="env"></div>
-  <div id="liveness"></div>
-  <div id="readiness"></div>
-  <div id="fs"></div>
-
+  <div id="root"></div>
   <script src="built/bundle.js" type="text/javascript"></script>
 </body>
 </html>

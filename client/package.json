@@ -6,7 +6,7 @@
   "scripts": {
     "start": "webpack-dev-server",
     "dev": "webpack -d --watch",
-    "build": "webpack -p"
+    "build": "NODE_ENV=production webpack"
   },
   "author": "",
   "private": true,
