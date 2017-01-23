@@ -31,6 +31,7 @@ import (
 	"github.com/jbeda/kuard/pkg/config"
 	"github.com/jbeda/kuard/pkg/debugprobe"
 	"github.com/jbeda/kuard/pkg/debugsitedata"
+	"github.com/jbeda/kuard/pkg/env"
 	"github.com/jbeda/kuard/pkg/htmlutils"
 	"github.com/jbeda/kuard/pkg/sitedata"
 	"github.com/jbeda/kuard/pkg/version"
@@ -51,14 +52,10 @@ type pageContext struct {
 	RequestDump  string
 	RequestProto string
 	RequestAddr  string
-	Env          map[string]string
 }
 
 type kuard struct {
 	tg *htmlutils.TemplateGroup
-
-	live  *debugprobe.Probe
-	ready *debugprobe.Probe
 }
 
 func (k *kuard) getPageContext(r *http.Request) *pageContext {
@@ -69,12 +66,6 @@ func (k *kuard) getPageContext(r *http.Request) *pageContext {
 	c.RequestDump = strings.TrimSpace(string(reqDump))
 	c.RequestProto = r.Proto
 	c.RequestAddr = r.RemoteAddr
-	c.Env = map[string]string{}
-	for _, e := range os.Environ() {
-		splits := strings.SplitN(e, "=", 2)
-		k, v := splits[0], splits[1]
-		c.Env[k] = v
-	}
 
 	return c
 }
@@ -83,7 +74,11 @@ func (k *kuard) rootHandler(w http.ResponseWriter, r *http.Request, _ httprouter
 	k.tg.Render(w, "index.html", k.getPageContext(r))
 }
 
-func (k *kuard) addRoutes(router *httprouter.Router) {
+func NewApp(router *httprouter.Router) *kuard {
+	k := &kuard{
+		tg: &htmlutils.TemplateGroup{},
+	}
+
 	// Add the root handler
 	router.GET("/", k.rootHandler)
 
@@ -107,16 +102,10 @@ func (k *kuard) addRoutes(router *httprouter.Router) {
 	router.Handler("GET", "/static/*filepath", http.StripPrefix("/static/", http.FileServer(fs)))
 	router.Handler("GET", "/fs/*filepath", http.StripPrefix("/fs", http.FileServer(http.Dir("/"))))
 
-	k.live.AddRoutes(router)
-	k.ready.AddRoutes(router)
-}
+	debugprobe.New("/healthy").AddRoutes(router)
+	debugprobe.New("/ready").AddRoutes(router)
+	env.New("/env").AddRoutes(router)
 
-func NewApp() *kuard {
-	k := &kuard{
-		tg: &htmlutils.TemplateGroup{},
-	}
-	k.live = debugprobe.New("/healthy", k.tg)
-	k.ready = debugprobe.New("/ready", k.tg)
 	return k
 }
 
@@ -130,9 +119,8 @@ func main() {
 	log.Println("* and secret information. Be careful.")
 	log.Println(strings.Repeat("*", 70))
 
-	app := NewApp()
 	router := httprouter.New()
-	app.addRoutes(router)
+	NewApp(router)
 
 	log.Printf("Serving on %v", *serveAddr)
 	log.Fatal(http.ListenAndServe(*serveAddr, loggingMiddleware(router)))

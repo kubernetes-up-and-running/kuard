@@ -34,42 +34,7 @@
     </div>
   </details>
 
-  <details>
-    <summary>Environment</summary>
-    <div>
-      <table>
-      <tr><th>Key</th><th>Value</th>
-      {{range $k, $v := .Env}}
-        <TR><TD><CODE>{{$k}}</CODE></TD><TD><CODE>{{$v}}</CODE></TD></TR>
-      {{end}}
-      </table>
-    </div>
-  </details>
-
-  {{define "probe"}}
-  <div>
-    <p>Probe is being served on <a href="{{.BasePath}}">{{.BasePath}}</a></p>
-    <p>{{if eq .FailNext 0 }}Probe will permanently succeed
-       {{- else if gt .FailNext 0 }}Probe will fail for next {{.FailNext}} calls
-       {{- else}}Probe will permanently fail{{end}}
-    </p>
-    {{- if .History}}
-    <table>
-      <tr>
-        <th>When</th><th>&nbsp;</th><th>Status</th>
-      </tr>
-      {{- range .History }}
-      <tr>
-        <td>{{.When|friendlytime}}</td><td>{{.When|reltime}}</td><td>{{.Code}}</td>
-      </tr>
-      {{- end}}
-    </table>
-    {{- else}}
-    <p>No recorded probe history</p>
-    {{- end}}
-  </div>
-  {{end}}
-
+  <div id="env"></div>
   <div id="liveness"></div>
   <div id="readiness"></div>
 

@@ -31,13 +31,11 @@ import (
 const maxHistory = 20
 
 type Probe struct {
-	mu sync.Mutex
-
-	tg *htmlutils.TemplateGroup
+	basePath string
+	mu       sync.Mutex
 
 	lastID int
 
-	basePath string
 	// If failNext > 0, then fail next probe and decrement.  If failNext < 0, then
 	// fail forever.
 	failNext int
@@ -50,10 +48,9 @@ type ProbeHistory struct {
 	Code int
 }
 
-func New(base string, tg *htmlutils.TemplateGroup) *Probe {
+func New(base string) *Probe {
 	return &Probe{
 		basePath: base,
-		tg:       tg,
 	}
 }
 

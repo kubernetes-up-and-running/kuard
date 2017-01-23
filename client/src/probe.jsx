@@ -28,7 +28,7 @@ class Probe extends React.Component {
 
   configure(e, n) {
     e.preventDefault();
-    var payload = JSON.stringify({
+    let payload = JSON.stringify({
       failNext: n
     });
     fetch(this.props.path+"/api", {
@@ -53,7 +53,7 @@ class Probe extends React.Component {
     let history = <p> No recorded probe history </p>
     if (this.state.history.length > 0) {
       let rows = [];
-      for (var h of this.state.history) {
+      for (let h of this.state.history) {
         rows.push(
           <tr key={h.id}>
             <td>{h.id}</td>
