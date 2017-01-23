@@ -52,9 +52,6 @@ type pageContext struct {
 	RequestProto string
 	RequestAddr  string
 	Env          map[string]string
-
-	Liveness  *debugprobe.ProbeContext
-	Readiness *debugprobe.ProbeContext
 }
 
 type kuard struct {
@@ -78,8 +75,6 @@ func (k *kuard) getPageContext(r *http.Request) *pageContext {
 		k, v := splits[0], splits[1]
 		c.Env[k] = v
 	}
-	c.Readiness = k.ready.GetContext()
-	c.Liveness = k.live.GetContext()
 
 	return c
 }

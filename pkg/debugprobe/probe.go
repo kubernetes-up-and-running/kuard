@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 	"sync"
 	"time"
 
@@ -36,6 +35,8 @@ type Probe struct {
 
 	tg *htmlutils.TemplateGroup
 
+	lastID int
+
 	basePath string
 	// If failNext > 0, then fail next probe and decrement.  If failNext < 0, then
 	// fail forever.
@@ -44,15 +45,9 @@ type Probe struct {
 }
 
 type ProbeHistory struct {
+	ID   int
 	When time.Time
 	Code int
-}
-
-// ProbeContext is appropriate for putting in a template for rendering.
-type ProbeContext struct {
-	BasePath string
-	FailNext int
-	History  []ProbeHistory
 }
 
 func New(base string, tg *htmlutils.TemplateGroup) *Probe {
@@ -64,9 +59,6 @@ func New(base string, tg *htmlutils.TemplateGroup) *Probe {
 
 func (p *Probe) AddRoutes(r *httprouter.Router) {
 	r.GET(p.basePath, p.Handle)
-	r.POST(p.basePath+"/config", p.Config)
-	r.GET(p.basePath+"/render", p.Render)
-
 	r.GET(p.basePath+"/api", p.APIGet)
 	r.PUT(p.basePath+"/api", p.APIPut)
 }
@@ -75,6 +67,10 @@ func (p *Probe) APIGet(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
+	p.lockedGet(w, r)
+}
+
+func (p *Probe) lockedGet(w http.ResponseWriter, r *http.Request) {
 	s := &ProbeStatus{
 		ProbePath: p.basePath,
 		FailNext:  p.failNext,
@@ -83,6 +79,7 @@ func (p *Probe) APIGet(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	s.History = make([]ProbeStatusHistory, l)
 	for i, v := range p.history {
 		h := &s.History[l-1-i]
+		h.ID = v.ID
 		h.When = htmlutils.FriendlyTime(v.When)
 		h.RelWhen = htmlutils.RelativeTime(v.When)
 		h.Code = v.Code
@@ -105,7 +102,7 @@ func (p *Probe) APIPut(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 
 	p.failNext = c.FailNext
 
-	w.WriteHeader(http.StatusOK)
+	p.lockedGet(w, r)
 }
 
 func (p *Probe) Handle(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -129,28 +126,10 @@ func (p *Probe) Handle(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	p.recordRequest(r, status)
 }
 
-func (p *Probe) Config(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-
-	rawFail := r.FormValue("fail")
-	if len(rawFail) > 0 {
-		fail, err := strconv.Atoi(rawFail)
-		if err != nil {
-			http.Error(w, "Could not parse 'fail' param", 400)
-			return
-		}
-		p.failNext = fail
-	}
-	http.Redirect(w, r, "/", http.StatusFound)
-}
-
-func (p *Probe) Render(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	p.tg.Render(w, "probe.html", p.GetContext())
-}
-
 func (p *Probe) recordRequest(_ *http.Request, code int) {
+	p.lastID++
 	entry := &ProbeHistory{
+		ID:   p.lastID,
 		When: time.Now(),
 		Code: code,
 	}
@@ -158,20 +137,4 @@ func (p *Probe) recordRequest(_ *http.Request, code int) {
 	if len(p.history) > maxHistory {
 		p.history = p.history[len(p.history)-maxHistory:]
 	}
-}
-
-func (p *Probe) GetContext() *ProbeContext {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-
-	c := &ProbeContext{
-		BasePath: p.basePath,
-		FailNext: p.failNext,
-	}
-	l := len(p.history)
-	c.History = make([]ProbeHistory, l)
-	for i, v := range p.history {
-		c.History[l-1-i] = *v
-	}
-	return c
 }

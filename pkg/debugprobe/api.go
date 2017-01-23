@@ -25,6 +25,7 @@ type ProbeStatus struct {
 
 // ProbeStatusHistory is a record of a probe call
 type ProbeStatusHistory struct {
+	ID      int    `json:"id"`
 	When    string `json:"when"`
 	RelWhen string `json:"relWhen"`
 	Code    int    `json:"code"`
