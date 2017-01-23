@@ -46,7 +46,7 @@ VERSION_BASE ?= $(shell git describe --tags --always --dirty)
 #VERSION := 1.2.3
 
 # Set to 1 to print more verbose output from the build.
-VERBOSE ?= 0
+export VERBOSE ?= 0
 
 # Include standard build rules.
 include rules.mk

@@ -85,38 +85,48 @@ all-push: $(addprefix push-, $(ALL_ARCH))
 .PHONY: build
 build: $(GO_FAKEVER_BINARIES)
 
-$(BUILD_IMAGE_BUILDSTAMP): Dockerfile.build
+$(BUILD_IMAGE_BUILDSTAMP): build/init_data.sh Dockerfile.build
 	@echo "container: $(BUILD_IMAGE)"
 	docker build                                                    \
 		$(DOCKER_BUILD_FLAGS)                                         \
 		-t $(BUILD_IMAGE)                                             \
+		--build-arg "ALL_ARCH=$(ALL_ARCH)"                            \
 		-f Dockerfile.build .                                         \
 		$(VERBOSE_OUTPUT)
+	docker volume create $(BUILD_IMAGE)-data $(VERBOSE_OUTPUT)
+	docker volume create $(BUILD_IMAGE)-node $(VERBOSE_OUTPUT)
+	docker run $(DOCKER_RUN_FLAGS)                   \
+	    -v $(BUILD_IMAGE)-data:/data                 \
+	    -v $(BUILD_IMAGE)-node:/data/go/src/$(PKG)/client/node_modules       \
+	    -v $$(pwd)/build:/build                      \
+	    -e TARGET_UIDGID=$$(id -u):$$(id -g)         \
+	    $(BUILD_IMAGE)                               \
+	    /build/init_data.sh                          \
+	    $(VERBOSE_OUTPUT)
 	echo "$(BUILD_IMAGE)" > $@
 	docker images -q $(BUILD_IMAGE) >> $@
 
 # Rules for all bin/$(FAKEVER)/$(ARCH)/$(BINARY)
 GO_BINARIES = $(addprefix bin/$(FAKEVER)/$(ARCH)/,$(BINARIES))
 define GO_BINARIES_RULE
-$(GO_BINARIES): build-dirs $(BUILD_IMAGE_BUILDSTAMP)
+$(GO_BINARIES): build/build.sh $(BUILD_IMAGE_BUILDSTAMP)
 	@echo "building : $$@"
 	docker run                                                               \
 	    $(DOCKER_RUN_FLAGS)                                                  \
 	    --sig-proxy=true                                                     \
+	    -e VERBOSE=$(VERBOSE)                                                \
+	    -e ARCH=$(ARCH)                                                      \
+	    -e PKG=$(PKG)                                                        \
+	    -e VERSION=$(VERSION_BASE)-$(FAKEVER)                                \
 	    -u $$$$(id -u):$$$$(id -g)                                           \
-	    -v $$$$(pwd)/.go:/go                                                 \
-	    -v $$$$(pwd):/go/src/$(PKG)                                          \
-	    -v $$$$(pwd)/bin/$(FAKEVER)/$(ARCH):/go/bin                          \
-	    -v $$$$(pwd)/bin/$(FAKEVER)/$(ARCH):/go/bin/linux_$(ARCH)            \
-	    -v $$$$(pwd)/.go/std/$(ARCH):/usr/local/go/pkg/linux_$(ARCH)_static  \
-	    -w /go/src/$(PKG)                                                    \
+	    -v $(BUILD_IMAGE)-data:/data                                         \
+	    -v $(BUILD_IMAGE)-node:/data/go/src/$(PKG)/client/node_modules       \
+	    -v $$$$(pwd):/data/go/src/$(PKG)                                     \
+	    -v $$$$(pwd)/bin/$(FAKEVER)/$(ARCH):/data/go/bin                     \
+	    -v $$$$(pwd)/bin/$(FAKEVER)/$(ARCH):/data/go/bin/linux_$(ARCH)       \
+	    -w /data/go/src/$(PKG)                                               \
 	    $(BUILD_IMAGE)                                                       \
-	    /bin/sh -c "                                                         \
-	        ARCH=$(ARCH)                                                     \
-	        VERSION=$(VERSION_BASE)-$(FAKEVER)                               \
-	        PKG=$(PKG)                                                       \
-	        ./build/build.sh                                                 \
-	    "
+	    ./build/build.sh $(VERBOSE_OUTPUT)
 endef
 $(foreach FAKEVER,$(FAKE_VERSIONS),\
   $(eval $(GO_BINARIES_RULE)))
@@ -189,16 +199,16 @@ push-names:
 
 # Rule for `test`
 .PHONY: test
-test: build-dirs $(BUILD_IMAGE_BUILDSTAMP)
+test: $(BUILD_IMAGE_BUILDSTAMP)
 	docker run                                                             \
 	    $(DOCKER_RUN_FLAGS)                                                \
 	    --sig-proxy=true                                                   \
 	    -u $$(id -u):$$(id -g)                                             \
-	    -v $$(pwd)/.go:/go                                                 \
-	    -v $$(pwd):/go/src/$(PKG)                                          \
-	    -v $$(pwd)/bin/$(ARCH):/go/bin                                     \
-	    -v $$(pwd)/.go/std/$(ARCH):/usr/local/go/pkg/linux_$(ARCH)_static  \
-	    -w /go/src/$(PKG)                                                  \
+			-v $(BUILD_IMAGE)-data:/data                                       \
+	    -v $(BUILD_IMAGE)-node:/data/go/src/$(PKG)/client/node_modules     \
+	    -v $$(pwd):/data/go/src/$(PKG)                                     \
+	    -v $$(pwd)/bin/$(ARCH):/data/go/bin                                \
+	    -w /data/go/src/$(PKG)                                             \
 	    $(BUILD_IMAGE)                                                     \
 	    /bin/sh -c "                                                       \
 	        ./build/test.sh $(SRC_DIRS)                                    \
@@ -209,21 +219,17 @@ test: build-dirs $(BUILD_IMAGE_BUILDSTAMP)
 version:
 	@echo $(VERSION_BASE)
 
-.PHONY: build-dirs
-build-dirs:
-	$(foreach FAKEVER,$(FAKE_VERSIONS),eval mkdir -p bin/$(FAKEVER)/$(ARCH);)
-	mkdir -p .go/src/$(PKG) .go/pkg .go/bin .go/std/$(ARCH)
-
 .PHONY: clean
 clean: container-clean bin-clean
 
 .PHONY: container-clean
 container-clean:
+	docker volume rm -f $(BUILD_IMAGE)-data $(BUILD_IMAGE)-node $(VERBOSE_OUTPUT)
 	rm -f .*-container .*-dockerfile .*-push
 
 .PHONY: bin-clean
 bin-clean:
-	rm -rf .go bin
+	rm -rf bin
 
 .PHONY: help
 help:

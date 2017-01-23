@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Copyright 2016 The Kubernetes Authors.
 #
@@ -18,6 +18,14 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+echo "Verbose: ${VERBOSE}"
+GO_FLAGS=
+if [[ "${VERBOSE:-0}" = "1" ]]; then
+  echo "Building with VERBOSE"
+  GO_FLAGS="-x"
+  set -o xtrace
+fi
+
 if [ -z "${PKG}" ]; then
     echo "PKG must be set"
     exit 1
@@ -34,8 +42,15 @@ fi
 export CGO_ENABLED=0
 export GOARCH="${ARCH}"
 
-go generate -x ./...
+(
+  cd client
+  npm install --loglevel=error
+  npm run build
+)
+
+go generate ${GO_FLAGS} ./cmd/... ./pkg/...
 go install                                                         \
+    ${GO_FLAGS}                                                    \
     -installsuffix "static"                                        \
     -ldflags "-X ${PKG}/pkg/version.VERSION=${VERSION}"            \
-    ./...
+    ./cmd/...
