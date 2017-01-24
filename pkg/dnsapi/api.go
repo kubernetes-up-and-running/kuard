@@ -97,7 +97,7 @@ func dnsQuery(t string, name string) (string, error) {
 	} else {
 		// TODO: respect NDOTS
 		for _, s := range config.Search {
-			names = append(names, name+s)
+			names = append(names, name+"."+s)
 		}
 		names = append(names, name)
 	}
