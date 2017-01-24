@@ -31,6 +31,7 @@ import (
 	"github.com/jbeda/kuard/pkg/config"
 	"github.com/jbeda/kuard/pkg/debugprobe"
 	"github.com/jbeda/kuard/pkg/debugsitedata"
+	"github.com/jbeda/kuard/pkg/dnsapi"
 	"github.com/jbeda/kuard/pkg/env"
 	"github.com/jbeda/kuard/pkg/htmlutils"
 	"github.com/jbeda/kuard/pkg/sitedata"
@@ -111,6 +112,7 @@ func NewApp(router *httprouter.Router) *kuard {
 	debugprobe.New("/healthy").AddRoutes(router)
 	debugprobe.New("/ready").AddRoutes(router)
 	env.New("/env").AddRoutes(router)
+	dnsapi.New("/dns").AddRoutes(router)
 
 	return k
 }
