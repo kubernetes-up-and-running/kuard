@@ -18,6 +18,10 @@
 			"ImportPath": "github.com/julienschmidt/httprouter",
 			"Comment": "v1.1-41-g8a45e95",
 			"Rev": "8a45e95fc75cb77048068a62daed98cc22fdac7c"
+		},
+		{
+			"ImportPath": "github.com/miekg/dns",
+			"Rev": "ca336a1f95a6b89be9c250df26c7a41742eb4a6f"
 		}
 	]
 }
