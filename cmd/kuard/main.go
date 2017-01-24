@@ -20,6 +20,7 @@ import (
 	"flag"
 	"html/template"
 	"log"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -48,6 +49,8 @@ func loggingMiddleware(handler http.Handler) http.Handler {
 }
 
 type pageContext struct {
+	Hostname     string       `json:"hostname"`
+	Addrs        []string     `json:"addrs"`
 	Version      string       `json:"version"`
 	VersionColor template.CSS `json:"versionColor"`
 	RequestDump  string       `json:"requestDump"`
@@ -61,6 +64,19 @@ type kuard struct {
 
 func (k *kuard) getPageContext(r *http.Request) *pageContext {
 	c := &pageContext{}
+	c.Hostname, _ = os.Hostname()
+
+	addrs, _ := net.InterfaceAddrs()
+	c.Addrs = []string{}
+	for _, addr := range addrs {
+		// check the address type and if it is not a loopback
+		if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				c.Addrs = append(c.Addrs, ipnet.IP.String())
+			}
+		}
+	}
+
 	c.Version = version.VERSION
 	c.VersionColor = template.CSS(htmlutils.ColorFromString(version.VERSION))
 	reqDump, _ := httputil.DumpRequest(r, false)

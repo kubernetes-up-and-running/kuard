@@ -6,16 +6,23 @@ import Dns from './dns';
 
 class App extends React.Component {
   render () {
+
+    let addrs = [];
+    for (let a of this.props.page.addrs) {
+      addrs.push(<span key={a}>{a}</span>, " ")
+    }
+
     return (
       <div>
         <div className="title">
-          <h1>Kubernetes Up and Running</h1>
+          <h1>{this.props.page.hostname}</h1>
           <div>Demo application version <i>{this.props.page.version}</i></div>
+          <div>Serving on {addrs}</div>
         </div>
 
         <div className="warning">WARNING: This server may expose sensitive and secret information. Be careful.</div>
 
-        <Details open={true} title="Request Details">
+        <Details title="Request Details">
           <div><b>Proto:</b> <code>{this.props.page.requestProto}</code></div>
           <div><b>Client addr:</b> <code>{this.props.page.requestAddr}</code></div>
           <div><b>Dump:</b></div>

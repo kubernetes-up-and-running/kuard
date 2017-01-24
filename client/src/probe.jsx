@@ -78,7 +78,7 @@ class Probe extends React.Component {
     }
 
     return (
-      <Details title={this.props.title}>
+      <Details title={this.props.title} open={this.props.open}>
         <p>Probe is being served on <a href={this.props.path}>{this.props.path}</a></p>
         <p>{probeDesc}<br/>
            <span className="small">

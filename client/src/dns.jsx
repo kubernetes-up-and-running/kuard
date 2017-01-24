@@ -77,7 +77,7 @@ Dns.propTypes =  {
 }
 
 Dns.defaultProps = {
-  open: true
+  open: false
 }
 
 

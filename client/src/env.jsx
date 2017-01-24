@@ -32,7 +32,7 @@ class Env extends React.Component {
     }
 
     return (
-      <Details title="Environment">
+      <Details title="Environment" open={this.props.open}>
         <table>
           <thead>
             <tr>
