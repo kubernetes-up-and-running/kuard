@@ -109,6 +109,9 @@ $(BUILD_IMAGE_BUILDSTAMP): build/init_data.sh Dockerfile.build
 # Rules for all bin/$(FAKEVER)/$(ARCH)/$(BINARY)
 GO_BINARIES = $(addprefix bin/$(FAKEVER)/$(ARCH)/,$(BINARIES))
 define GO_BINARIES_RULE
+# Make this target phony so we always rebuild it. We don't track build
+# dependencies.
+.PHONY: $(GO_BINARIES)
 $(GO_BINARIES): build/build.sh $(BUILD_IMAGE_BUILDSTAMP)
 	@echo "building : $$@"
 	docker run                                                               \
