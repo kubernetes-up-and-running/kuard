@@ -16,6 +16,7 @@ limitations under the License.
 package app
 
 import (
+	"github.com/jbeda/kuard/pkg/debugprobe"
 	"github.com/jbeda/kuard/pkg/keygen"
 	"github.com/jbeda/kuard/pkg/sitedata"
 	"github.com/spf13/pflag"
@@ -28,10 +29,16 @@ type Config struct {
 	ServeAddr    string `mapstructure:"address"`
 
 	KeyGen keygen.Config
+
+	Liveness  debugprobe.ProbeConfig
+	Readiness debugprobe.ProbeConfig
 }
 
 func (k *App) BindConfig(v *viper.Viper, fs *pflag.FlagSet) {
 	k.kg.BindConfig(v, fs)
+
+	k.live.BindConfig("liveness", v, fs)
+	k.ready.BindConfig("readiness", v, fs)
 
 	fs.Bool("debug", false, "Debug/devel mode")
 	v.BindPFlag("debug", fs.Lookup("debug"))

@@ -36,10 +36,8 @@ type Probe struct {
 
 	lastID int
 
-	// If failNext > 0, then fail next probe and decrement.  If failNext < 0, then
-	// fail forever.
-	failNext int
-	history  []*ProbeHistory
+	c       ProbeConfig
+	history []*ProbeHistory
 }
 
 type ProbeHistory struct {
@@ -70,7 +68,7 @@ func (p *Probe) APIGet(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 func (p *Probe) lockedGet(w http.ResponseWriter, r *http.Request) {
 	s := &ProbeStatus{
 		ProbePath: p.basePath,
-		FailNext:  p.failNext,
+		FailNext:  p.c.FailNext,
 	}
 	l := len(p.history)
 	s.History = make([]ProbeStatusHistory, l)
@@ -85,21 +83,18 @@ func (p *Probe) lockedGet(w http.ResponseWriter, r *http.Request) {
 	apiutils.ServeJSON(w, s)
 }
 
-func (p *Probe) APIPut(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	c := &ProbeConfig{}
+func (p *Probe) APIPut(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	c := ProbeConfig{}
 
-	err := json.NewDecoder(r.Body).Decode(c)
+	err := json.NewDecoder(r.Body).Decode(&c)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	p.mu.Lock()
-	defer p.mu.Unlock()
+	p.SetConfig(c)
 
-	p.failNext = c.FailNext
-
-	p.lockedGet(w, r)
+	p.APIGet(w, r, params)
 }
 
 func (p *Probe) Handle(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -108,11 +103,11 @@ func (p *Probe) Handle(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 
 	status := http.StatusOK
 	message := "ok"
-	if p.failNext > 0 {
+	if p.c.FailNext > 0 {
 		status = http.StatusInternalServerError
-		p.failNext--
-		message = fmt.Sprintf("fail, %d left", p.failNext)
-	} else if p.failNext < 0 {
+		p.c.FailNext--
+		message = fmt.Sprintf("fail, %d left", p.c.FailNext)
+	} else if p.c.FailNext < 0 {
 		status = http.StatusInternalServerError
 		message = "fail, permanent"
 	}

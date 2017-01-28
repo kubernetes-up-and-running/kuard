@@ -40,8 +40,11 @@ type App struct {
 	c  Config
 	tg *htmlutils.TemplateGroup
 
-	kg *keygen.Workload
-	r  *httprouter.Router
+	kg    *keygen.Workload
+	live  *debugprobe.Probe
+	ready *debugprobe.Probe
+
+	r *httprouter.Router
 }
 
 func (k *App) getPageContext(r *http.Request) *pageContext {
@@ -95,8 +98,10 @@ func NewApp() *App {
 
 	router.Handler("GET", "/fs/*filepath", http.StripPrefix("/fs", http.FileServer(http.Dir("/"))))
 
-	debugprobe.New("/healthy").AddRoutes(router)
-	debugprobe.New("/ready").AddRoutes(router)
+	k.live = debugprobe.New("/healthy")
+	k.live.AddRoutes(router)
+	k.ready = debugprobe.New("/ready")
+	k.ready.AddRoutes(router)
 	env.New("/env").AddRoutes(router)
 	dnsapi.New("/dns").AddRoutes(router)
 

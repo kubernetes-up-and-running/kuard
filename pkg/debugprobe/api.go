@@ -30,8 +30,3 @@ type ProbeStatusHistory struct {
 	RelWhen string `json:"relWhen"`
 	Code    int    `json:"code"`
 }
-
-// ProbeConfig is used to configure how the probe will respond
-type ProbeConfig struct {
-	FailNext int `json:"failNext"`
-}
