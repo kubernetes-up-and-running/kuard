@@ -16,20 +16,52 @@ limitations under the License.
 
 package keygen
 
-import "github.com/julienschmidt/httprouter"
+import (
+	"context"
+	"log"
+	"sync"
 
-type Workload struct {
+	"github.com/julienschmidt/httprouter"
+)
+
+type KeyGen struct {
 	path   string
 	config Config
+
+	cancelFunc context.CancelFunc
+
+	mu sync.Mutex
 }
 
-func New(path string) *Workload {
-	kg := &Workload{
+func New(path string) *KeyGen {
+	kg := &KeyGen{
 		path: path,
 	}
 	return kg
 }
 
-func (kg *Workload) AddRoutes(router *httprouter.Router) {
+func (kg *KeyGen) AddRoutes(router *httprouter.Router) {
 
+}
+
+func (kg *KeyGen) Restart() {
+	kg.mu.Lock()
+	defer kg.mu.Unlock()
+
+	// Cancel currently running workload
+	if kg.cancelFunc != nil {
+		kg.cancelFunc()
+		kg.cancelFunc = nil
+	}
+
+	var ctx context.Context
+	ctx, kg.cancelFunc = context.WithCancel(context.Background())
+
+	log.Print("Launching new workload")
+
+	w := workload{
+		c:   kg.config,
+		ctx: ctx,
+	}
+	go w.startWork()
 }

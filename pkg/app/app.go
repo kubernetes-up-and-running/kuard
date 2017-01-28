@@ -55,7 +55,7 @@ type App struct {
 	c  Config
 	tg *htmlutils.TemplateGroup
 
-	kg    *keygen.Workload
+	kg    *keygen.KeyGen
 	live  *debugprobe.Probe
 	ready *debugprobe.Probe
 

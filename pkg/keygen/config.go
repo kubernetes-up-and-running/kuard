@@ -38,7 +38,7 @@ type Config struct {
 	ExitCode       int  `json:"exitCode" mapstructure:"exit-code"`
 }
 
-func (kg *Workload) BindConfig(v *viper.Viper, fs *pflag.FlagSet) {
+func (kg *KeyGen) BindConfig(v *viper.Viper, fs *pflag.FlagSet) {
 	v.Set("keygen", map[string]interface{}{})
 	fs.Bool("keygen-enabled", false, "Enable KeyGen workload")
 	fs.Int("keygen-num-to-gen", 0, "The number of keys to generate. Set to 0 for infinite")
@@ -56,6 +56,8 @@ func (kg *Workload) BindConfig(v *viper.Viper, fs *pflag.FlagSet) {
 	})
 }
 
-func (kg *Workload) LoadConfig(c Config) {
+func (kg *KeyGen) LoadConfig(c Config) {
 	kg.config = c
+
+	kg.Restart()
 }
