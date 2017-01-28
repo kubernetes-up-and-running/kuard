@@ -14,14 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package debugsitedata provides a bindata interface to the sitedata directory
-package debugsitedata
-
-//go:generate go-bindata -dev -pkg $GOPACKAGE -prefix ../../sitedata/ -o bindata.go ../../sitedata/...
-
-var rootDir string
-
-// SetRootDir sets the root directory to load debug assets from
-func SetRootDir(root string) {
-	rootDir = root
-}
+// Package keygen is a sample workload for our demo server.  As a sample time
+// consuming work load, this package generates RSA private/public key pairs.
+//
+// See the Config struct for a set of parameters for this workload.
+package keygen

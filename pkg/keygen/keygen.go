@@ -13,9 +13,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package config
 
-import "flag"
+// Package keygen is a sample workload for our demo server.  As a sample time
+// consuming work load, this package generates RSA private/public key pairs.
+//
+// See the Config struct for a set of parameters for this workload.
+package keygen
 
-var Debug = flag.Bool("debug", false, "Debug/devel mode")
-var DebugRootDir = flag.String("debug-sitedata-dir", "./sitedata", "When in debug/dev mode, directory to find the static assets.")
+import "github.com/julienschmidt/httprouter"
+
+type Workload struct {
+	path   string
+	config Config
+}
+
+func New(path string) *Workload {
+	kg := &Workload{
+		path: path,
+	}
+	return kg
+}
+
+func (kg *Workload) AddRoutes(router *httprouter.Router) {
+
+}

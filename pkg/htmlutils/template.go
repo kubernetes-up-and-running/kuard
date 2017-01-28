@@ -22,16 +22,25 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"path"
 	"strconv"
+	"sync"
 
-	"github.com/jbeda/kuard/pkg/config"
-	"github.com/jbeda/kuard/pkg/debugsitedata"
 	"github.com/jbeda/kuard/pkg/sitedata"
 )
 
 type TemplateGroup struct {
-	t *template.Template
+	mu sync.Mutex
+	t  *template.Template
+
+	debug bool
+}
+
+func (g *TemplateGroup) SetConfig(debug bool) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	g.debug = debug
+	g.t = nil
 }
 
 func (g *TemplateGroup) Render(w http.ResponseWriter, name string, context interface{}) {
@@ -50,7 +59,10 @@ func (g *TemplateGroup) Render(w http.ResponseWriter, name string, context inter
 }
 
 func (g *TemplateGroup) GetTemplate(name string) *template.Template {
-	if g.t == nil || *config.Debug {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	if g.t == nil || g.debug {
 		g.t = g.LoadTemplates()
 	}
 	t := g.t.Lookup(name)
@@ -62,30 +74,18 @@ func (g *TemplateGroup) GetTemplate(name string) *template.Template {
 
 // LoadTemplates loads the templates for our toy server
 func (g *TemplateGroup) LoadTemplates() *template.Template {
-	assetDir := sitedata.AssetDir
-	asset := sitedata.Asset
-	if *config.Debug {
-		assetDir = debugsitedata.AssetDir
-		asset = debugsitedata.Asset
-	}
-
-	tFiles, err := assetDir("templates")
+	tData, err := sitedata.LoadFilesInDir("templates")
 	if err != nil {
-		panic(err)
+		log.Printf("Error loading template files: %v", err)
 	}
 
 	t := template.New("").Funcs(FuncMap())
 
-	for _, tFile := range tFiles {
-		fullName := path.Join("templates", tFile)
-		data, err := asset(fullName)
+	for f, fData := range tData {
+		log.Printf("Loading template for %v", f)
+		_, err := t.New(f).Parse(string(fData))
 		if err != nil {
-			continue
-		}
-		log.Printf("Loading template for %v", tFile)
-		_, err = t.New(tFile).Parse(string(data))
-		if err != nil {
-			log.Printf("ERROR: Could parse template %v: %v", tFile, err)
+			log.Printf("ERROR: Could parse template %v: %v", f, err)
 		}
 	}
 	return t
