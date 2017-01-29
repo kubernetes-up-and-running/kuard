@@ -1,5 +1,4 @@
 import React from 'react';
-import Details from './details'
 
 class Dns extends React.Component {
   constructor(props) {
@@ -30,7 +29,7 @@ class Dns extends React.Component {
     event.preventDefault();
 
     let payload = JSON.stringify(this.state.query);
-    fetch(this.props.path+"/api", {
+    fetch(this.props.serverPath+"/api", {
       method: "POST",
       body: payload
     })
@@ -42,43 +41,54 @@ class Dns extends React.Component {
   }
 
   render () {
-    return (
-      <Details title="DNS Resolver" open={this.props.open}>
-        <form onSubmit={this.handleSubmit}>
-          <label htmlFor="dns-type">DNS Type</label> { "" }
-          <input
-            id="dns-type"
-            name="type"
-            value={this.state.query.type}
-            onChange={this.handleChange}
-            type="text"/> { "" }
-          <label htmlFor="dns-name">Name</label> { "" }
-          <input
-            id="dns-name"
-            name="name"
-            value={this.state.query.name}
-            onChange={this.handleChange}
-            type="text"/> { "" }
-          <input
-            type="submit"
-            value="Query" />
-        </form>
+
+    let result = ""
+    if(this.state.response.result) {
+      result = (
         <pre>
-        {this.state.response.result}
+          {this.state.response.result}
         </pre>
-      </Details>
+      )
+    }
+    return (
+      <div>
+        <div className="panel panel-default">
+          <div className="panel-heading">Server side DNS query</div>
+          <div className="panel-body">
+            <form className="form" onSubmit={this.handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="dns-type">DNS Type</label> { " " }
+                <input
+                  id="dns-type"
+                  name="type"
+                  value={this.state.query.type}
+                  onChange={this.handleChange}
+                  type="text"/>
+              </div> { " " }
+              <div className="form-group">
+                <label htmlFor="dns-name">Name</label> { " " }
+                <input
+                  id="dns-name"
+                  name="name"
+                  value={this.state.query.name}
+                  onChange={this.handleChange}
+                  type="text"/>
+              </div> { " " }
+              <input
+                className="btn btn-default"
+                type="submit"
+                value="Query" />
+            </form>
+          </div>
+        </div>
+        { result }
+      </div>
     )
   }
 }
 
 Dns.propTypes =  {
-  path: React.PropTypes.string.isRequired,
-  open: React.PropTypes.bool
+  serverPath: React.PropTypes.string.isRequired,
 }
-
-Dns.defaultProps = {
-  open: false
-}
-
 
 module.exports = Dns;

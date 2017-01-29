@@ -1,5 +1,4 @@
 import React from 'react';
-import Details from './details'
 import Form from "react-jsonschema-form";
 
 const schema = {
@@ -7,22 +6,31 @@ const schema = {
   "type": "object",
   "properties": {
     "enable": {
+      "title": "Enabled?",
       "type": "boolean"
     },
     "numToGen": {
+      "title": "Number of keys to generate. 0 is infinite.",
       "type": "integer"
     },
     "timeToRun": {
+      "title": "Time to run, in seconds. 0 is infinite.",
       "type": "integer"
     },
     "exitOnComplete": {
+      "title": "Exit server on completion?",
       "type": "boolean"
     },
     "exitCode": {
+      "title": "Exit code when exiting. 0 is success.",
       "type": "integer"
     }
   }
 };
+
+const uiSchema = {
+
+}
 
 class KeyGen extends React.Component {
   constructor(props) {
@@ -43,7 +51,7 @@ class KeyGen extends React.Component {
   }
 
   loadState(initial) {
-    fetch(this.props.path)
+    fetch(this.props.serverPath)
     .then(response => response.json())
     .then(response => {
       if(initial) {
@@ -63,12 +71,12 @@ class KeyGen extends React.Component {
   }
 
   componentWillUnmount() {
-    this.clearInterval(this.timer);
+    clearInterval(this.timer);
   }
 
   handleSubmit(event) {
     let payload = JSON.stringify(this.state.config);
-    fetch(this.props.path, {
+    fetch(this.props.serverPath, {
       method: "PUT",
       body: payload
     })
@@ -87,39 +95,47 @@ class KeyGen extends React.Component {
   }
 
   render () {
-    let history = <p> No recorded workload history </p>
+    let history = <p>No recorded workload history</p>
     if (this.state.history.length > 0) {
-      history = [];
+      let historyItems = [];
       for (let h of this.state.history) {
-        history.push(<pre key={h.id}>{h.data}</pre>)
+        historyItems.push(<span key={h.id}>{h.data}{"\n"}</span>)
       }
-      history.reverse()
+      historyItems.reverse()
+      history = (<pre>{historyItems}</pre>)
     }
 
     return (
-      <Details title="Key Generation Artificial Workload" open={this.props.open}>
-        <Form
-          schema={schema}
-          formData={this.state.config}
-          onChange={this.handleChange}
-          onSubmit={this.handleSubmit}>
-        </Form>
-        <div>
-        {history}
+      <div>
+        <div className="panel panel-default">
+          <div className="panel-heading">KeyGen Synthetic Workload</div>
+          <div className="panel-body">
+            <div>This controls a synthetic workload on the server: creating 4096
+                 bit RSA key pairs.  These parameters control how many to create
+                 and, optionally, cause the server to exit with a specific exit
+                 code.
+            </div>
+            <Form
+              schema={schema}
+              className="form"
+              formData={this.state.config}
+              onChange={this.handleChange}
+              onSubmit={this.handleSubmit}>
+              <input
+                className="btn btn-default"
+                type="submit"
+                value="Submit" />
+            </Form>
+          </div>
         </div>
-      </Details>
+        {history}
+      </div>
     )
   }
 }
 
 KeyGen.propTypes =  {
-  path: React.PropTypes.string.isRequired,
-  open: React.PropTypes.bool
+  serverPath: React.PropTypes.string.isRequired,
 }
-
-KeyGen.defaultProps = {
-  open: false
-}
-
 
 module.exports = KeyGen;

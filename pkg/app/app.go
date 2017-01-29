@@ -106,6 +106,7 @@ func NewApp() *App {
 
 	// Add the root handler
 	router.GET("/", k.rootHandler)
+	router.GET("/-/*path", k.rootHandler)
 
 	// Add the static files
 	sitedata.AddRoutes(router, "/built")

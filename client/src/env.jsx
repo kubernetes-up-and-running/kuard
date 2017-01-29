@@ -1,5 +1,4 @@
 import React from 'react';
-import Details from './details'
 
 class Env extends React.Component {
   constructor(props) {
@@ -10,7 +9,7 @@ class Env extends React.Component {
   }
 
   loadState() {
-    fetch(this.props.path+"/api")
+    fetch(this.props.apiPath)
     .then(response => response.json())
     .then(response => this.setState(response));
   }
@@ -25,37 +24,29 @@ class Env extends React.Component {
     for (let k in this.state.env) {
       rows.push(
         <tr key={k}>
-          <td><code>{k}</code></td>
-          <td><code>{this.state.env[k]}</code></td>
+          <td><samp>{k}</samp></td>
+          <td><samp>{this.state.env[k]}</samp></td>
         </tr>
       )
     }
 
     return (
-      <Details title="Environment" open={this.props.open}>
-        <table>
-          <thead>
-            <tr>
-              <th>Key</th><th>Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows}
-          </tbody>
-        </table>
-      </Details>
+      <table className="table table-condensed table-bordered">
+        <thead>
+          <tr>
+            <th>Key</th><th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows}
+        </tbody>
+      </table>
     )
   }
 }
 
 Env.propTypes =  {
-  path: React.PropTypes.string.isRequired,
-  open: React.PropTypes.bool
+  apiPath: React.PropTypes.string.isRequired,
 }
-
-Env.defaultProps = {
-  open: false
-}
-
 
 module.exports = Env;

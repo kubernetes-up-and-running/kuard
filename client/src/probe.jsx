@@ -1,5 +1,4 @@
 import React from 'react';
-import Details from './details'
 
 class Probe extends React.Component {
   constructor(props) {
@@ -12,7 +11,7 @@ class Probe extends React.Component {
   }
 
   loadState() {
-    fetch(this.props.path+"/api")
+    fetch(this.props.serverPath+"/api")
     .then(response => response.json())
     .then(response => this.setState(response));
   }
@@ -23,7 +22,7 @@ class Probe extends React.Component {
   }
 
   componentWillUnmount() {
-    this.clearInterval(this.timer);
+    clearInterval(this.timer);
   }
 
   configure(e, n) {
@@ -31,7 +30,7 @@ class Probe extends React.Component {
     let payload = JSON.stringify({
       failNext: n
     });
-    fetch(this.props.path+"/api", {
+    fetch(this.props.serverPath+"/api", {
       method: "PUT",
       body: payload
     })
@@ -64,10 +63,10 @@ class Probe extends React.Component {
         )
       }
       history = (
-        <table>
+        <table className="table table-condensed table-bordered">
           <thead>
             <tr>
-              <th>ID</th><th>When</th><th></th><th>Status</th>
+              <th>ID</th><th colSpan="2">When</th><th>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -78,8 +77,8 @@ class Probe extends React.Component {
     }
 
     return (
-      <Details title={this.props.title} open={this.props.open}>
-        <p>Probe is being served on <a href={this.props.path}>{this.props.path}</a></p>
+      <div>
+        <p>Probe is being served on <a href={this.props.serverPath}>{this.props.serverPath}</a></p>
         <p>{probeDesc}<br/>
            <span className="small">
              <a className="failn" onClick={e => this.configure(e, 0)} href="#">Succeed</a> | { " " }
@@ -93,19 +92,13 @@ class Probe extends React.Component {
           </span>
         </p>
         {history}
-      </Details>
+      </div>
     )
   }
 }
 
 Probe.propTypes =  {
-  title: React.PropTypes.string.isRequired,
-  path: React.PropTypes.string.isRequired,
-  open: React.PropTypes.bool
-}
-
-Probe.defaultProps = {
-  open: false
+  serverPath: React.PropTypes.string.isRequired,
 }
 
 
