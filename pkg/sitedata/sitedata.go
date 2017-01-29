@@ -21,6 +21,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/julienschmidt/httprouter"
@@ -36,6 +37,7 @@ func SetConfig(d bool, drd string) {
 }
 
 func GetStaticHandler(prefix string) httprouter.Handle {
+	prefix = strings.TrimPrefix(prefix, "/")
 	embedFS := &assetfs.AssetFS{
 		Asset:     Asset,
 		AssetDir:  func(path string) ([]string, error) { return nil, os.ErrNotExist },
