@@ -1,5 +1,28 @@
 import React from 'react';
 import Details from './details'
+import Form from "react-jsonschema-form";
+
+const schema = {
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "enable": {
+      "type": "boolean"
+    },
+    "numToGen": {
+      "type": "integer"
+    },
+    "timeToRun": {
+      "type": "integer"
+    },
+    "exitOnComplete": {
+      "type": "boolean"
+    },
+    "exitCode": {
+      "type": "integer"
+    }
+  }
+};
 
 class KeyGen extends React.Component {
   constructor(props) {
@@ -26,7 +49,10 @@ class KeyGen extends React.Component {
       if(initial) {
         this.setState(response);
       } else {
-        this.setState(state => state.history = response.history)
+        this.setState(state => {
+          state.history = response.history
+          return state
+        })
       }
     });
   }
@@ -40,19 +66,7 @@ class KeyGen extends React.Component {
     this.clearInterval(this.timer);
   }
 
-  handleChange(event) {
-    const target = event.target;
-    const k = target.name;
-    const v = target.type === 'checkbox' ? target.checked : target.value;
-    this.setState(previousState => {
-      previousState.config[k] = v;
-      return previousState;
-    })
-  }
-
   handleSubmit(event) {
-    event.preventDefault();
-
     let payload = JSON.stringify(this.state.config);
     fetch(this.props.path, {
       method: "PUT",
@@ -63,6 +77,13 @@ class KeyGen extends React.Component {
       previousState = response
       return previousState
     }));
+  }
+
+  handleChange({formData}) {
+    this.setState(state => {
+      state.config = formData;
+      return state
+    })
   }
 
   render () {
@@ -77,42 +98,15 @@ class KeyGen extends React.Component {
 
     return (
       <Details title="Key Generation Artificial Workload" open={this.props.open}>
-        <form autoComplete="off" onSubmit={this.handleSubmit}>
-          <label>Enabled <input
-              type="checkbox"
-              name="enable"
-              checked={this.state.config.enable}
-              onChange={this.handleChange}
-            /></label> { "" }
-          <label>Number To Generate <input
-              type="text"
-              name="numToGen"
-              value={this.state.config.numToGen}
-              onChange={this.handleChange}
-            /></label> { " " }
-          <label>Runtime (s) <input
-              type="text"
-              name="timeToRun"
-              value={this.state.config.timeToRun}
-              onChange={this.handleChange}
-            /></label> { " " }
-          <label>Exit when done <input
-              type="checkbox"
-              name="exitOnComplete"
-              checked={this.state.config.exitOnComplete}
-              onChange={this.handleChange}
-            /></label> { "" }
-          <label>Exit code <input
-              type="text"
-              name="exitCode"
-              value={this.state.config.exitCode}
-              onChange={this.handleChange}
-            /></label> { " " }
-          <input
-            type="submit"
-            value="Submit" />
-        </form>
+        <Form
+          schema={schema}
+          formData={this.state.config}
+          onChange={this.handleChange}
+          onSubmit={this.handleSubmit}>
+        </Form>
+        <div>
         {history}
+        </div>
       </Details>
     )
   }

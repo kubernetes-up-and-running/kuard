@@ -65,6 +65,7 @@ var config = {
       },
     ]
   },
+  devtool: "#cheap-module-eval-source-map",
   plugins: getPlugins(),
   resolve: {
     extensions: ['', '.js', '.jsx']
@@ -77,5 +78,9 @@ var config = {
     }
   }
 };
+
+if (isProd) {
+  config.devtool = "#cheap-module-source-map"
+}
 
 module.exports = config;
