@@ -29,8 +29,10 @@ import (
 	"github.com/jbeda/kuard/pkg/env"
 	"github.com/jbeda/kuard/pkg/htmlutils"
 	"github.com/jbeda/kuard/pkg/keygen"
+	"github.com/jbeda/kuard/pkg/memq/server"
 	"github.com/jbeda/kuard/pkg/sitedata"
 	"github.com/jbeda/kuard/pkg/version"
+
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -123,6 +125,8 @@ func NewApp() *App {
 
 	k.kg = keygen.New("/keygen")
 	k.kg.AddRoutes(router)
+
+	memqserver.NewServer("/memq/server").AddRoutes(router)
 
 	return k
 }

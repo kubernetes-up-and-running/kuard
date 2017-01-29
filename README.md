@@ -9,6 +9,33 @@ Have Docker installed.
 make push REGISTRY=<my-gcr-registry>
 ```
 
+### KeyGen Workload
+
+To help simulate batch workers, we have a synthetic workload of generating 4096 bit RSA keys.  This can be configured through the UI or the command line.
+
+```
+--keygen-enable               Enable KeyGen workload
+--keygen-exit-code int        Exit code when workload complete
+--keygen-exit-on-complete     Exit after workload is complete
+--keygen-num-to-gen int       The number of keys to generate. Set to 0 for infinite
+--keygen-time-to-run int      The target run time in seconds. Set to 0 for infinite
+```
+
+### MemQ server
+
+We also have a simple in memory queue with REST API.  This is based heavily on https://github.com/kelseyhightower/memq.
+
+The API is as follows with Urls being relative to `<server addr>/memq/server`.  See `pkg/memq/types.go` for the data structures returned.
+
+| Method | Url | Desc
+| --- | --- | ---
+| `GET` | `/stats` | Get stats on all queues
+| `PUT` | `/queues/:queue` | Create a queue
+| `DELETE` | `/queue/:queue` | Delete a queue
+| `POST` | `/queue/:queue/drain` | Discard all items in queue
+| `POST` | `/queue/:queue/enqueue` | Add item to queue.  Body is plain text. Response is message object.
+| `POST` | `/queue/:queue/dequeue` | Grab an item off the queue and return it. Returns a 204 "No Content" if queue is empty.
+
 ### Versions
 
 Images built will automatically have the git verison (based on tag) applied.  In addition, there is an idea of a "fake version".  This is used so that we can use the same basic server to demonstrate upgrade scenarios.
