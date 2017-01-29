@@ -26,8 +26,13 @@ import (
 
 // ProbeStatus is returned from a GET to this API endpoing
 type KeyGenStatus struct {
-	Config  Config   `json:"config"`
-	History []string `json:"history"`
+	Config  Config    `json:"config"`
+	History []History `json:"history"`
+}
+
+type History struct {
+	ID   int    `json:"id"`
+	Data string `json:"data"`
 }
 
 func (kg *KeyGen) APIPut(w http.ResponseWriter, r *http.Request, params httprouter.Params) {

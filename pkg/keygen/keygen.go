@@ -27,20 +27,19 @@ import (
 const maxHistory = 20
 
 type KeyGen struct {
-	path    string
-	config  Config
-	history []string
-
-	nextID int
-
-	cancelFunc context.CancelFunc
-
-	mu sync.Mutex
+	mu             sync.Mutex
+	path           string
+	config         Config
+	history        []History
+	nextHistoryID  int
+	nextWorkloadID int
+	cancelFunc     context.CancelFunc
 }
 
 func New(path string) *KeyGen {
 	kg := &KeyGen{
-		path: path,
+		path:    path,
+		history: []History{},
 	}
 	return kg
 }
@@ -65,12 +64,12 @@ func (kg *KeyGen) Restart() {
 		ctx, kg.cancelFunc = context.WithCancel(context.Background())
 
 		w := workload{
-			id:  kg.nextID,
+			id:  kg.nextWorkloadID,
 			c:   kg.config,
 			ctx: ctx,
 			out: kg.WorkloadOutput,
 		}
-		kg.nextID++
+		kg.nextWorkloadID++
 		go w.startWork()
 	}
 }
@@ -81,8 +80,10 @@ func (kg *KeyGen) WorkloadOutput(s string) {
 
 	log.Print(s)
 
-	kg.history = append(kg.history, s)
+	kg.history = append(kg.history, History{ID: kg.nextHistoryID, Data: s})
 	if len(kg.history) > maxHistory {
 		kg.history = kg.history[len(kg.history)-maxHistory:]
 	}
+
+	kg.nextHistoryID++
 }

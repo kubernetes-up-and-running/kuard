@@ -5,7 +5,7 @@ class Probe extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      probePath: 'foo',
+      probePath: '',
       failNext: 0,
       history: []
     };

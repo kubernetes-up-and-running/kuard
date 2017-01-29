@@ -49,7 +49,7 @@ func GetStaticHandler(prefix string) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		if debug {
 			fs := http.Dir(filepath.Join(debugRootDir, prefix))
-			handler := http.StripPrefix(prefix, http.FileServer(fs))
+			handler := http.StripPrefix("/"+prefix+"/", http.FileServer(fs))
 			handler.ServeHTTP(w, r)
 		} else {
 			embedHandler.ServeHTTP(w, r)

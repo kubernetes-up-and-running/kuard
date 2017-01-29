@@ -3,6 +3,7 @@ import Details from './details';
 import Env from './env';
 import Probe from './probe';
 import Dns from './dns';
+import KeyGen from './keygen';
 
 class App extends React.Component {
   render () {
@@ -38,6 +39,7 @@ class App extends React.Component {
         <Probe title="Readiness Check" path="/ready" />
 
         <Dns path="/dns" />
+        <KeyGen path="/keygen" />
 
         <Details title="File System">
             <a href="/fs/">Browse the root file system for this server.</a>
