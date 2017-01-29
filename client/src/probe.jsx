@@ -1,4 +1,5 @@
 import React from 'react';
+import fetchError from './fetcherror';
 
 class Probe extends React.Component {
   constructor(props) {
@@ -12,8 +13,10 @@ class Probe extends React.Component {
 
   loadState() {
     fetch(this.props.serverPath+"/api")
+    .then(fetchError)
     .then(response => response.json())
-    .then(response => this.setState(response));
+    .then(response => this.setState(response))
+    .catch(err => this.context.reportConnError());
   }
 
   componentDidMount() {
@@ -34,8 +37,10 @@ class Probe extends React.Component {
       method: "PUT",
       body: payload
     })
+    .then(fetchError)
     .then(response => response.json())
-    .then(response => this.setState(response));
+    .then(response => this.setState(response))
+    .catch(err => this.context.reportConnError());
   }
 
   render () {
@@ -98,8 +103,11 @@ class Probe extends React.Component {
 }
 
 Probe.propTypes =  {
-  serverPath: React.PropTypes.string.isRequired,
+  serverPath: React.PropTypes.string.isRequired
 }
 
+Probe.contextTypes = {
+  reportConnError: React.PropTypes.func
+};
 
 module.exports = Probe;

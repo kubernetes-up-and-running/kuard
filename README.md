@@ -60,4 +60,3 @@ These have been heavily modified.
 ### TODO
 * [ ] Make file system browser better.  Show size, permissions, etc.  Might be able to do this by faking out an `index.html` as part of the http.FileSystem stuff.
 * [x] Switch to React with an API to the server?  This mixed template stuff sucks.
-* [ ] Find a better way to pick unique colors to show version.  Perhaps just have a table based on the fakeversion.

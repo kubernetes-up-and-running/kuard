@@ -1,5 +1,6 @@
 import React from 'react';
 import Form from "react-jsonschema-form";
+import fetchError from './fetcherror';
 
 const schema = {
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -52,6 +53,7 @@ class KeyGen extends React.Component {
 
   loadState(initial) {
     fetch(this.props.serverPath)
+    .then(fetchError)
     .then(response => response.json())
     .then(response => {
       if(initial) {
@@ -62,7 +64,8 @@ class KeyGen extends React.Component {
           return state
         })
       }
-    });
+    })
+    .catch(err => this.context.reportConnError());
   }
 
   componentDidMount() {
@@ -80,11 +83,13 @@ class KeyGen extends React.Component {
       method: "PUT",
       body: payload
     })
+    .then(fetchError)
     .then(response => response.json())
     .then(response => this.setState(previousState => {
       previousState = response
       return previousState
-    }));
+    }))
+    .catch(err => this.context.reportConnError());
   }
 
   handleChange({formData}) {
@@ -137,5 +142,10 @@ class KeyGen extends React.Component {
 KeyGen.propTypes =  {
   serverPath: React.PropTypes.string.isRequired,
 }
+
+KeyGen.contextTypes = {
+  reportConnError: React.PropTypes.func
+};
+
 
 module.exports = KeyGen;
