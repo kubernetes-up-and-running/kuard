@@ -24,9 +24,14 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+const maxHistory = 20
+
 type KeyGen struct {
-	path   string
-	config Config
+	path    string
+	config  Config
+	history []string
+
+	nextID int
 
 	cancelFunc context.CancelFunc
 
@@ -41,7 +46,8 @@ func New(path string) *KeyGen {
 }
 
 func (kg *KeyGen) AddRoutes(router *httprouter.Router) {
-
+	router.GET(kg.path, kg.APIGet)
+	router.PUT(kg.path, kg.APIPut)
 }
 
 func (kg *KeyGen) Restart() {
@@ -54,14 +60,29 @@ func (kg *KeyGen) Restart() {
 		kg.cancelFunc = nil
 	}
 
-	var ctx context.Context
-	ctx, kg.cancelFunc = context.WithCancel(context.Background())
+	if kg.config.Enable {
+		var ctx context.Context
+		ctx, kg.cancelFunc = context.WithCancel(context.Background())
 
-	log.Print("Launching new workload")
-
-	w := workload{
-		c:   kg.config,
-		ctx: ctx,
+		w := workload{
+			id:  kg.nextID,
+			c:   kg.config,
+			ctx: ctx,
+			out: kg.WorkloadOutput,
+		}
+		kg.nextID++
+		go w.startWork()
 	}
-	go w.startWork()
+}
+
+func (kg *KeyGen) WorkloadOutput(s string) {
+	kg.mu.Lock()
+	defer kg.mu.Unlock()
+
+	log.Print(s)
+
+	kg.history = append(kg.history, s)
+	if len(kg.history) > maxHistory {
+		kg.history = kg.history[len(kg.history)-maxHistory:]
+	}
 }

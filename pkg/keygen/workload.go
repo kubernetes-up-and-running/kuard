@@ -21,7 +21,6 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -31,14 +30,17 @@ import (
 )
 
 type workload struct {
+	id        int
 	c         Config
 	generated int
 	timeout   <-chan time.Time
 	endTime   time.Time
 	ctx       context.Context
+	out       func(string)
 }
 
 func (w *workload) startWork() {
+	w.logf("(ID %d) Workload starting", w.id)
 	if w.c.TimeToRun > 0 {
 		dur := time.Duration(w.c.TimeToRun) * time.Second
 		w.endTime = time.Now().Add(dur)
@@ -83,7 +85,7 @@ func (w *workload) isDone() bool {
 }
 
 func (w *workload) done(canceled bool) {
-	log.Printf("(ID %p) Workload exiting", w)
+	w.logf("(ID %d) Workload exiting", w.id)
 	if !canceled && w.c.ExitOnComplete {
 		os.Exit(w.c.ExitCode)
 	}
@@ -108,5 +110,13 @@ func (w *workload) itemDone(desc string) {
 		desc = ": " + desc
 	}
 
-	log.Printf("(ID %p%s%s) Item done%s", w, count, timeleft, desc)
+	w.logf("(ID %d%s%s) Item done%s", w.id, count, timeleft, desc)
+}
+
+func (w *workload) log(s string) {
+	w.out(s)
+}
+
+func (w *workload) logf(format string, v ...interface{}) {
+	w.out(fmt.Sprintf(format, v...))
 }

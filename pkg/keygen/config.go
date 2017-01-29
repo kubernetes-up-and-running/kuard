@@ -25,7 +25,7 @@ import (
 
 // Config is the input parameters to the keygen workload.
 type Config struct {
-	Enabled bool `json:"enabled"`
+	Enable bool `json:"enable"`
 
 	// This limits the amount of work to do.  The workload will stop when either
 	// of these is complete.  Zero is interpreted as "infinity".  TimeToRun is in
@@ -40,7 +40,7 @@ type Config struct {
 
 func (kg *KeyGen) BindConfig(v *viper.Viper, fs *pflag.FlagSet) {
 	v.Set("keygen", map[string]interface{}{})
-	fs.Bool("keygen-enabled", false, "Enable KeyGen workload")
+	fs.Bool("keygen-enable", false, "Enable KeyGen workload")
 	fs.Int("keygen-num-to-gen", 0, "The number of keys to generate. Set to 0 for infinite")
 	fs.Int("keygen-time-to-run", 0, "The target run time in seconds. Set to 0 for infinite")
 	fs.Bool("keygen-exit-on-complete", false, "Exit after workload is complete")
