@@ -58,7 +58,7 @@ class App extends React.Component {
             <HighlightLink href="/" className="nav-item">Request Details</HighlightLink>
             <HighlightLink href="/-/env" className="nav-item">Server Env</HighlightLink>
             <HighlightLink href="/-/liveness" className="nav-item">Liveness Probe</HighlightLink>
-            <HighlightLink href="/-/readiness" className="nav-item">Readiness Prober</HighlightLink>
+            <HighlightLink href="/-/readiness" className="nav-item">Readiness Probe</HighlightLink>
             <HighlightLink href="/-/dns" className="nav-item">DNS Query</HighlightLink>
             <HighlightLink href="/-/keygen" className="nav-item">KeyGen Workload</HighlightLink>
             <HighlightLink href="/-/memq" className="nav-item">MemQ Server</HighlightLink>
