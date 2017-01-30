@@ -18,8 +18,13 @@ package keygen
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
+	"fmt"
 	"log"
 	"sync"
+
+	"golang.org/x/crypto/ssh"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -63,14 +68,19 @@ func (kg *KeyGen) Restart() {
 		var ctx context.Context
 		ctx, kg.cancelFunc = context.WithCancel(context.Background())
 
-		w := workload{
-			id:  kg.nextWorkloadID,
-			c:   kg.config,
-			ctx: ctx,
-			out: kg.WorkloadOutput,
+		if len(kg.config.MemQQueue) > 0 && len(kg.config.MemQServer) > 0 {
+			w := newMemQWorker(ctx, kg.config, kg.WorkloadOutput)
+			go w.startWork()
+		} else {
+			w := workload{
+				id:  kg.nextWorkloadID,
+				c:   kg.config,
+				ctx: ctx,
+				out: kg.WorkloadOutput,
+			}
+			kg.nextWorkloadID++
+			go w.startWork()
 		}
-		kg.nextWorkloadID++
-		go w.startWork()
 	}
 }
 
@@ -86,4 +96,18 @@ func (kg *KeyGen) WorkloadOutput(s string) {
 	}
 
 	kg.nextHistoryID++
+}
+
+func generateKey() string {
+	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	if err != nil {
+		return fmt.Sprintf("Error generating key: %v", err)
+	}
+
+	pub, err := ssh.NewPublicKey(&privateKey.PublicKey)
+	if err != nil {
+		return fmt.Sprintf("Error generating ssh key: %v", err)
+	}
+
+	return ssh.FingerprintSHA256(pub)
 }

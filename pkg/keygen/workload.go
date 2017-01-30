@@ -18,13 +18,9 @@ package keygen
 
 import (
 	"context"
-	"crypto/rand"
-	"crypto/rsa"
 	"fmt"
 	"os"
 	"time"
-
-	"golang.org/x/crypto/ssh"
 
 	humanize "github.com/dustin/go-humanize"
 )
@@ -48,22 +44,8 @@ func (w *workload) startWork() {
 	}
 
 	for !w.isDone() {
-		w.itemDone(w.work())
+		w.itemDone(generateKey())
 	}
-}
-
-func (w *workload) work() string {
-	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
-	if err != nil {
-		return fmt.Sprintf("Error generating key: %v", err)
-	}
-
-	pub, err := ssh.NewPublicKey(&privateKey.PublicKey)
-	if err != nil {
-		return fmt.Sprintf("Error generating ssh key: %v", err)
-	}
-
-	return ssh.FingerprintSHA256(pub)
 }
 
 func (w *workload) isDone() bool {

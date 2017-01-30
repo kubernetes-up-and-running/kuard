@@ -10,6 +10,14 @@ const schema = {
       "title": "Enabled?",
       "type": "boolean"
     },
+    "exitOnComplete": {
+      "title": "Exit server on completion?",
+      "type": "boolean"
+    },
+    "exitCode": {
+      "title": "Exit code when exiting. 0 is success.",
+      "type": "integer"
+    },
     "numToGen": {
       "title": "Number of keys to generate. 0 is infinite.",
       "type": "integer"
@@ -18,19 +26,21 @@ const schema = {
       "title": "Time to run, in seconds. 0 is infinite.",
       "type": "integer"
     },
-    "exitOnComplete": {
-      "title": "Exit server on completion?",
-      "type": "boolean"
+    "memQServer": {
+      "title": "Base URL of the MemQ server to draw from. Can be http://localhost:8080/memq/server.",
+      "type": "string"
     },
-    "exitCode": {
-      "title": "Exit code when exiting. 0 is success.",
-      "type": "integer"
+    "memQQueue": {
+      "title": "The Queue to pull work items from.",
+      "type": "string"
     }
   }
 };
 
 const uiSchema = {
-
+  enable: {
+    classNames: "foo"
+  }
 }
 
 class KeyGen extends React.Component {
@@ -122,6 +132,7 @@ class KeyGen extends React.Component {
             </div>
             <Form
               schema={schema}
+              uiSchema={uiSchema}
               className="form"
               formData={this.state.config}
               onChange={this.handleChange}
