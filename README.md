@@ -55,11 +55,11 @@ Images built will automatically have the git verison (based on tag) applied.  In
 Right now we create 3 fake versions: `1`, `2`, and `3`.  This translates into the following container images:
 
 ```
-gcr.io/kuar-demo/kuard-amd64:v0.2-1
+gcr.io/kuar-demo/kuard-amd64:v0.4-1
 gcr.io/kuar-demo/kuard-amd64:1
-gcr.io/kuar-demo/kuard-amd64:v0.2-2
+gcr.io/kuar-demo/kuard-amd64:v0.4-2
 gcr.io/kuar-demo/kuard-amd64:2
-gcr.io/kuar-demo/kuard-amd64:v0.2-3
+gcr.io/kuar-demo/kuard-amd64:v0.4-3
 gcr.io/kuar-demo/kuard-amd64:3
 ```
 
