@@ -86,4 +86,4 @@ These have been heavily modified.
 
 ### TODO
 * [ ] Make file system browser better.  Show size, permissions, etc.  Might be able to do this by faking out an `index.html` as part of the http.FileSystem stuff.
-* [x] Switch to React with an API to the server?  This mixed template stuff sucks.
+* [ ] Clean up form for keygen workload.  It is too big and the form build doesn't have enough flexibility to really shrink it down.
