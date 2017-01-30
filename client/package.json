@@ -12,6 +12,7 @@
   "private": true,
   "dependencies": {
     "classnames": "^2.2.5",
+    "marked": "^0.3.6",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-jsonschema-form": "^0.42.0",

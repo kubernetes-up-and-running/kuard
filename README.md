@@ -25,7 +25,7 @@ To help simulate batch workers, we have a synthetic workload of generating 4096 
 
 We also have a simple in memory queue with REST API.  This is based heavily on https://github.com/kelseyhightower/memq.
 
-The API is as follows with Urls being relative to `<server addr>/memq/server`.  See `pkg/memq/types.go` for the data structures returned.
+The API is as follows with URLs being relative to `<server addr>/memq/server`.  See `pkg/memq/types.go` for the data structures returned.
 
 | Method | Url | Desc
 | --- | --- | ---

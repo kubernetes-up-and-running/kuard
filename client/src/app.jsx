@@ -6,6 +6,7 @@ import KeyGen from './keygen';
 import Request from './request';
 import HighlightLink from './highlightlink'
 import Disconnected from './disconnected'
+import MemQ from './memq'
 import { Location, Locations, Link } from 'react-router-component';
 
 function createElement(Component, props) {
@@ -60,6 +61,7 @@ class App extends React.Component {
             <HighlightLink href="/-/readiness" className="nav-item">Readiness Prober</HighlightLink>
             <HighlightLink href="/-/dns" className="nav-item">DNS Query</HighlightLink>
             <HighlightLink href="/-/keygen" className="nav-item">KeyGen Workload</HighlightLink>
+            <HighlightLink href="/-/memq" className="nav-item">MemQ Server</HighlightLink>
             <a className="nav-item" href="/fs/">File system browser</a>
           </div>
           <div className="content">
@@ -70,6 +72,7 @@ class App extends React.Component {
               <Location path="/-/readiness" serverPath="/ready" handler={Probe}/>
               <Location path="/-/dns" serverPath="/dns" handler={Dns}/>
               <Location path="/-/keygen" serverPath="/keygen" handler={KeyGen}/>
+              <Location path="/-/memq" serverPath="/memq" handler={MemQ}/>
             </Locations>
           </div>
         </div>
