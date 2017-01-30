@@ -1,5 +1,15 @@
-A demo application for "Kubernetes Up and Running".
+# Demo application for "Kubernetes Up and Running"
 
+![screenshot](docs/images/screenshot.png)
+
+### Running
+
+```
+kubectl run --restart=Never --image=gcr.io/kuar-demo/kuard-amd64:1 kuard
+kubectl port-forward kuard 8080:8080
+```
+
+Open your browser to [http://localhost:8080](http://localhost:8080).
 
 ### Building
 
@@ -17,6 +27,8 @@ To help simulate batch workers, we have a synthetic workload of generating 4096 
 --keygen-enable               Enable KeyGen workload
 --keygen-exit-code int        Exit code when workload complete
 --keygen-exit-on-complete     Exit after workload is complete
+--keygen-memq-queue string    The MemQ server queue to use. If MemQ is used, other limits are ignored.
+--keygen-memq-server string   The MemQ server to draw work items from.  If MemQ is used, other limits are ignored.
 --keygen-num-to-gen int       The number of keys to generate. Set to 0 for infinite
 --keygen-time-to-run int      The target run time in seconds. Set to 0 for infinite
 ```
@@ -60,14 +72,17 @@ For documentation where you want to demonstrate using versions but use the lates
 If you just want to do Go server development, you can build the client as part of a build `make`.  It'll drop the result in to `sitedata/built/`.
 
 If you want to do both Go server and React.js client dev, you need to do the following:
+
 1. Have Node installed
 2. In one terminal
+
   * `cd client`
   * `npm install`
   * `npm start`
   * This will start a debug node server on `localhost:8081`.  It'll proxy all unhandled requests to `localhost:8080`
+
 3. In another terminal
-  * `go generate ./...`
+  * `go generate ./pkg/...`
   * `go run cmd/kuard/*.go --debug`
 4. Open your browser to http://localhost:8081.
 
