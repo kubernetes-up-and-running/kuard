@@ -27,7 +27,8 @@ import (
 
 // EnvStatus is returned from a GET to this API endpoing
 type EnvStatus struct {
-	Env map[string]string `json:"env"`
+	CommandLine []string          `json:"commandLine"`
+	Env         map[string]string `json:"env"`
 }
 
 type Env struct {
@@ -46,6 +47,9 @@ func (e *Env) AddRoutes(r *httprouter.Router) {
 
 func (e *Env) APIGet(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	s := EnvStatus{}
+
+	s.CommandLine = os.Args
+
 	s.Env = map[string]string{}
 	for _, e := range os.Environ() {
 		splits := strings.SplitN(e, "=", 2)

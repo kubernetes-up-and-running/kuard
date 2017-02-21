@@ -7,7 +7,7 @@ import Request from './request';
 import HighlightLink from './highlightlink'
 import Disconnected from './disconnected'
 import MemQ from './memq'
-import { Location, Locations, Link } from 'react-router-component';
+import { Location, Locations } from 'react-router-component';
 
 function createElement(Component, props) {
   console.log(props)

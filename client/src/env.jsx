@@ -4,6 +4,7 @@ class Env extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      commandLine: [],
       env: {}
     };
   }
@@ -20,6 +21,12 @@ class Env extends React.Component {
 
 
   render () {
+    let args = [];
+    for (let [idx, arg] of this.state.commandLine.entries()) {
+      args.push(<code key={idx}>{arg}</code>)
+      args.push(" ")
+    }
+
     let rows = [];
     for (let k in this.state.env) {
       rows.push(
@@ -31,16 +38,22 @@ class Env extends React.Component {
     }
 
     return (
-      <table className="table table-condensed table-bordered">
-        <thead>
-          <tr>
-            <th>Key</th><th>Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows}
-        </tbody>
-      </table>
+      <div>
+        <dl>
+          <dt>Command Line</dt>
+          <dd>{args}</dd>
+        </dl>
+        <table className="table table-condensed table-bordered">
+          <thead>
+            <tr>
+              <th>Key</th><th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows}
+          </tbody>
+        </table>
+      </div>
     )
   }
 }
