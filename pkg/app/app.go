@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/jbeda/kuard/pkg/debugprobe"
@@ -93,9 +94,33 @@ func (k *App) rootHandler(w http.ResponseWriter, r *http.Request, _ httprouter.P
 	k.tg.Render(w, "index.html", k.getPageContext(r))
 }
 
+// Exists reports whether the named file or directory exists.
+func fileExists(name string) bool {
+	if _, err := os.Stat(name); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	return true
+}
+
 func (k *App) Run() {
-	log.Printf("Serving on %v", k.c.ServeAddr)
-	log.Fatal(http.ListenAndServe(k.c.ServeAddr, loggingMiddleware(k.r)))
+	r := loggingMiddleware(k.r)
+
+	// Look to see if we can find TLS certs
+	certFile := filepath.Join(k.c.TLSDir, "kuard.crt")
+	keyFile := filepath.Join(k.c.TLSDir, "kuard.key")
+	if fileExists(certFile) && fileExists(keyFile) {
+		go func() {
+			log.Printf("Serving HTTPS on %v", k.c.TLSAddr)
+			log.Fatal(http.ListenAndServeTLS(k.c.TLSAddr, certFile, keyFile, r))
+		}()
+	} else {
+		log.Printf("Could not find certificates to serve TLS")
+	}
+
+	log.Printf("Serving on HTTP on %v", k.c.ServeAddr)
+	log.Fatal(http.ListenAndServe(k.c.ServeAddr, r))
 }
 
 func NewApp() *App {
