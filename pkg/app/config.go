@@ -60,6 +60,9 @@ func (k *App) LoadConfig(v *viper.Viper) {
 		panic(err)
 	}
 
+	k.live.SetConfig(k.c.Liveness)
+	k.ready.SetConfig(k.c.Readiness)
+
 	k.kg.LoadConfig(k.c.KeyGen)
 
 	k.tg.SetConfig(k.c.Debug)
