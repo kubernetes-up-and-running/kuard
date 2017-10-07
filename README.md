@@ -82,6 +82,8 @@ If you want to do both Go server and React.js client dev, you need to do the fol
   * This will start a debug node server on `localhost:8081`.  It'll proxy all unhandled requests to `localhost:8080`
 
 3. In another terminal
+  * Ensure that $GOPATH is set to the directory with your go source code and binaries + ensure that $GOPATH is part of $PATH.
+  * `go get -u github.com/jteeuwen/go-bindata/...`
   * `go generate ./pkg/...`
   * `go run cmd/kuard/*.go --debug`
 4. Open your browser to http://localhost:8081.
