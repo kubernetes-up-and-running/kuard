@@ -23,7 +23,7 @@ import (
 	"net/http"
 	"path"
 
-	"github.com/jbeda/kuard/pkg/memq"
+	"github.com/kubernetes-up-and-running/kuard/pkg/memq"
 	"github.com/pkg/errors"
 )
 

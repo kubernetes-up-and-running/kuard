@@ -21,7 +21,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/jbeda/kuard/pkg/apiutils"
+	"github.com/kubernetes-up-and-running/kuard/pkg/apiutils"
 	"github.com/julienschmidt/httprouter"
 )
 

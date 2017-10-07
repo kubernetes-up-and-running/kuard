@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/jbeda/kuard",
+	"ImportPath": "github.com/kubernetes-up-and-running/kuard",
 	"GoVersion": "go1.7",
 	"GodepVersion": "v75",
 	"Packages": [

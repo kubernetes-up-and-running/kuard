@@ -16,9 +16,9 @@ limitations under the License.
 package app
 
 import (
-	"github.com/jbeda/kuard/pkg/debugprobe"
-	"github.com/jbeda/kuard/pkg/keygen"
-	"github.com/jbeda/kuard/pkg/sitedata"
+	"github.com/kubernetes-up-and-running/kuard/pkg/debugprobe"
+	"github.com/kubernetes-up-and-running/kuard/pkg/keygen"
+	"github.com/kubernetes-up-and-running/kuard/pkg/sitedata"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )

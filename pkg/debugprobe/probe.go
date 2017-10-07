@@ -23,8 +23,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jbeda/kuard/pkg/apiutils"
-	"github.com/jbeda/kuard/pkg/htmlutils"
+	"github.com/kubernetes-up-and-running/kuard/pkg/apiutils"
+	"github.com/kubernetes-up-and-running/kuard/pkg/htmlutils"
 	"github.com/julienschmidt/httprouter"
 )
 

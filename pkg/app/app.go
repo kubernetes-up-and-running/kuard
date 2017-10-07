@@ -25,14 +25,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jbeda/kuard/pkg/debugprobe"
-	"github.com/jbeda/kuard/pkg/dnsapi"
-	"github.com/jbeda/kuard/pkg/env"
-	"github.com/jbeda/kuard/pkg/htmlutils"
-	"github.com/jbeda/kuard/pkg/keygen"
-	"github.com/jbeda/kuard/pkg/memq/server"
-	"github.com/jbeda/kuard/pkg/sitedata"
-	"github.com/jbeda/kuard/pkg/version"
+	"github.com/kubernetes-up-and-running/kuard/pkg/debugprobe"
+	"github.com/kubernetes-up-and-running/kuard/pkg/dnsapi"
+	"github.com/kubernetes-up-and-running/kuard/pkg/env"
+	"github.com/kubernetes-up-and-running/kuard/pkg/htmlutils"
+	"github.com/kubernetes-up-and-running/kuard/pkg/keygen"
+	"github.com/kubernetes-up-and-running/kuard/pkg/memq/server"
+	"github.com/kubernetes-up-and-running/kuard/pkg/sitedata"
+	"github.com/kubernetes-up-and-running/kuard/pkg/version"
 
 	"github.com/julienschmidt/httprouter"
 )
