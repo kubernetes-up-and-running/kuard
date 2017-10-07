@@ -24,8 +24,8 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	"github.com/jbeda/kuard/pkg/app"
-	"github.com/jbeda/kuard/pkg/version"
+	"github.com/kubernetes-up-and-running/kuard/pkg/app"
+	"github.com/kubernetes-up-and-running/kuard/pkg/version"
 )
 
 func main() {

@@ -21,7 +21,7 @@ MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
 # Golang package.
-PKG := github.com/jbeda/kuard
+PKG := github.com/kubernetes-up-and-running/kuard
 
 # List of binaries to build. You must have a matching Dockerfile.BINARY
 # for each BINARY.

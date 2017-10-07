@@ -22,7 +22,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/jbeda/kuard/pkg/memq/client"
+	"github.com/kubernetes-up-and-running/kuard/pkg/memq/client"
 )
 
 type memQWorker struct {
