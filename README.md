@@ -43,10 +43,10 @@ The API is as follows with URLs being relative to `<server addr>/memq/server`.  
 | --- | --- | ---
 | `GET` | `/stats` | Get stats on all queues
 | `PUT` | `/queues/:queue` | Create a queue
-| `DELETE` | `/queue/:queue` | Delete a queue
-| `POST` | `/queue/:queue/drain` | Discard all items in queue
-| `POST` | `/queue/:queue/enqueue` | Add item to queue.  Body is plain text. Response is message object.
-| `POST` | `/queue/:queue/dequeue` | Grab an item off the queue and return it. Returns a 204 "No Content" if queue is empty.
+| `DELETE` | `/queues/:queue` | Delete a queue
+| `POST` | `/queues/:queue/drain` | Discard all items in queue
+| `POST` | `/queues/:queue/enqueue` | Add item to queue.  Body is plain text. Response is message object.
+| `POST` | `/queues/:queue/dequeue` | Grab an item off the queue and return it. Returns a 204 "No Content" if queue is empty.
 
 ### Versions
 
