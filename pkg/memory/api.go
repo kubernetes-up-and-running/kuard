@@ -28,7 +28,7 @@ import (
 
 type MemoryAPI struct {
 	basePath string
-	leak     [][]byte
+	leaks    [][]byte
 }
 
 // MemoryStatus is returned from a GET to this API endpoing
@@ -68,11 +68,16 @@ func (m *MemoryAPI) APIAlloc(w http.ResponseWriter, r *http.Request, _ httproute
 		http.Error(w, "bad size param", http.StatusBadRequest)
 	}
 
-	m.leak = append(m.leak, make([]byte, i, i))
+	leak := make([]byte, i, i)
+	for i := 0; i < len(leak); i++ {
+		leak[i] = 'x'
+	}
+
+	m.leaks = append(m.leaks, leak)
 }
 
 func (m *MemoryAPI) APIClear(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	m.leak = nil
+	m.leaks = nil
 	runtime.GC()
 	debug.FreeOSMemory()
 }
