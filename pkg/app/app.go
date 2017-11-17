@@ -30,6 +30,7 @@ import (
 	"github.com/kubernetes-up-and-running/kuard/pkg/env"
 	"github.com/kubernetes-up-and-running/kuard/pkg/htmlutils"
 	"github.com/kubernetes-up-and-running/kuard/pkg/keygen"
+	"github.com/kubernetes-up-and-running/kuard/pkg/memory"
 	"github.com/kubernetes-up-and-running/kuard/pkg/memq/server"
 	"github.com/kubernetes-up-and-running/kuard/pkg/sitedata"
 	"github.com/kubernetes-up-and-running/kuard/pkg/version"
@@ -58,6 +59,7 @@ type App struct {
 	c  Config
 	tg *htmlutils.TemplateGroup
 
+	m     *memory.MemoryAPI
 	kg    *keygen.KeyGen
 	live  *debugprobe.Probe
 	ready *debugprobe.Probe
@@ -141,6 +143,8 @@ func NewApp() *App {
 
 	router.Handler("GET", "/fs/*filepath", http.StripPrefix("/fs", http.FileServer(http.Dir("/"))))
 
+	k.m = memory.New("/mem")
+	k.m.AddRoutes(router)
 	k.live = debugprobe.New("/healthy")
 	k.live.AddRoutes(router)
 	k.ready = debugprobe.New("/ready")
