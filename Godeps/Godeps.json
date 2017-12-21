@@ -1,11 +1,15 @@
 {
 	"ImportPath": "github.com/kubernetes-up-and-running/kuard",
 	"GoVersion": "go1.7",
-	"GodepVersion": "v75",
+	"GodepVersion": "v79",
 	"Packages": [
 		"./..."
 	],
 	"Deps": [
+		{
+			"ImportPath": "github.com/beorn7/perks/quantile",
+			"Rev": "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
+		},
 		{
 			"ImportPath": "github.com/dustin/go-humanize",
 			"Rev": "7a41df006ff9af79a29f0ffa9c5f21fbe6314a2d"
@@ -15,9 +19,17 @@
 			"Rev": "9a6736ed45b44bf3835afeebb3034b57ed329f3e"
 		},
 		{
+			"ImportPath": "github.com/felixge/httpsnoop",
+			"Rev": "eadd4fad6aac69ae62379194fe0219f3dbc80fd3"
+		},
+		{
 			"ImportPath": "github.com/fsnotify/fsnotify",
 			"Comment": "v1.4.2-3-ga904159",
 			"Rev": "a904159b9206978bb6d53fcc7a769e5cd726c737"
+		},
+		{
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Rev": "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 		},
 		{
 			"ImportPath": "github.com/hashicorp/hcl",
@@ -66,6 +78,11 @@
 			"Rev": "b3b15ef068fd0b17ddf408a23669f20811d194d2"
 		},
 		{
+			"ImportPath": "github.com/matttproud/golang_protobuf_extensions/pbutil",
+			"Comment": "v1.0.0-2-gc12348c",
+			"Rev": "c12348ce28de40eed0136aa2b644d0ee0650e56c"
+		},
+		{
 			"ImportPath": "github.com/miekg/dns",
 			"Rev": "ca336a1f95a6b89be9c250df26c7a41742eb4a6f"
 		},
@@ -86,6 +103,36 @@
 			"ImportPath": "github.com/pkg/errors",
 			"Comment": "v0.8.0-2-g248dadf",
 			"Rev": "248dadf4e9068a0b3e79f02ed0a610d935de5302"
+		},
+		{
+			"ImportPath": "github.com/prometheus/client_golang/prometheus",
+			"Comment": "v0.9.0-pre1-15-g661e31b",
+			"Rev": "661e31bf844dfca9aeba15f27ea8aa0d485ad212"
+		},
+		{
+			"ImportPath": "github.com/prometheus/client_model/go",
+			"Comment": "model-0.0.2-16-g99fa1f4",
+			"Rev": "99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c"
+		},
+		{
+			"ImportPath": "github.com/prometheus/common/expfmt",
+			"Rev": "2e54d0b93cba2fd133edc32211dcc32c06ef72ca"
+		},
+		{
+			"ImportPath": "github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg",
+			"Rev": "2e54d0b93cba2fd133edc32211dcc32c06ef72ca"
+		},
+		{
+			"ImportPath": "github.com/prometheus/common/model",
+			"Rev": "2e54d0b93cba2fd133edc32211dcc32c06ef72ca"
+		},
+		{
+			"ImportPath": "github.com/prometheus/procfs",
+			"Rev": "f98634e408857669d61064b283c4cde240622865"
+		},
+		{
+			"ImportPath": "github.com/prometheus/procfs/xfs",
+			"Rev": "f98634e408857669d61064b283c4cde240622865"
 		},
 		{
 			"ImportPath": "github.com/spf13/afero",
