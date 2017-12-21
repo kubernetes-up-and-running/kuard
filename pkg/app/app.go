@@ -23,6 +23,7 @@ import (
 	"net/http/httputil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/kubernetes-up-and-running/kuard/pkg/debugprobe"
@@ -35,8 +36,27 @@ import (
 	"github.com/kubernetes-up-and-running/kuard/pkg/sitedata"
 	"github.com/kubernetes-up-and-running/kuard/pkg/version"
 
+	"github.com/felixge/httpsnoop"
 	"github.com/julienschmidt/httprouter"
+	"github.com/prometheus/client_golang/prometheus"
 )
+
+func init() {
+	prometheus.MustRegister(requestDuration)
+}
+
+var requestDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	Name:    "request_duration_seconds",
+	Help:    "Time serving HTTP request",
+	Buckets: prometheus.DefBuckets,
+}, []string{"method", "route", "status_code"})
+
+func promMiddleware(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		m := httpsnoop.CaptureMetrics(h, w, r)
+		requestDuration.WithLabelValues(r.Method, r.URL.Path, strconv.Itoa(m.Code)).Observe(m.Duration.Seconds())
+	})
+}
 
 func loggingMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -107,7 +127,7 @@ func fileExists(name string) bool {
 }
 
 func (k *App) Run() {
-	r := loggingMiddleware(k.r)
+	r := promMiddleware(loggingMiddleware(k.r))
 
 	// Look to see if we can find TLS certs
 	certFile := filepath.Join(k.c.TLSDir, "kuard.crt")
@@ -136,6 +156,8 @@ func NewApp() *App {
 	// Add the root handler
 	router.GET("/", k.rootHandler)
 	router.GET("/-/*path", k.rootHandler)
+
+	router.Handler("GET", "/metrics", prometheus.Handler())
 
 	// Add the static files
 	sitedata.AddRoutes(router, "/built")

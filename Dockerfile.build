@@ -32,3 +32,4 @@ RUN apk update && apk upgrade && apk add --no-cache git nodejs bash
 # Install any binaries in to /usr/local/bin instead of /go/bin as we will mask
 # /go/bin when doing real builds.
 RUN GOPATH=/tmp GOBIN=/usr/local/bin go get -u github.com/jteeuwen/go-bindata/...
+RUN GOPATH=/tmp GOBIN=/usr/local/bin go get github.com/tools/godep
