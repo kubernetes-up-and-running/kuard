@@ -23,13 +23,13 @@ ifeq ($(ARCH),amd64)
 	BASEIMAGE?=alpine
 endif
 ifeq ($(ARCH),arm)
-	BASEIMAGE?=armel/busybox
+	BASEIMAGE?=arm32v6/alpine
 endif
 ifeq ($(ARCH),arm64)
-	BASEIMAGE?=aarch64/busybox
+	BASEIMAGE?=arm64v8/alpine
 endif
 ifeq ($(ARCH),ppc64le)
-	BASEIMAGE?=ppc64le/busybox
+	BASEIMAGE?=ppc64le/alpine
 endif
 
 # These rules MUST be expanded at reference time (hence '=') as BINARY
