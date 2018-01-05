@@ -67,6 +67,8 @@ For documentation where you want to demonstrate using versions but use the lates
 
 (Another way to think about it is that `:1` is essentially `:latest-1`)
 
+We also build versions for `arm`, `arm64`, and `ppc64le`.  Just substitute the appropriate architecture in the image name.  These aren't as well tested as the `amd64` version but seem to work okay.
+
 ### Development
 
 If you just want to do Go server development, you can build the client as part of a build `make`.  It'll drop the result in to `sitedata/built/`.
