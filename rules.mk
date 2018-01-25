@@ -96,9 +96,9 @@ $(BUILD_IMAGE_BUILDSTAMP): build/init_data.sh Dockerfile.build
 	docker volume create $(BUILD_IMAGE)-data $(VERBOSE_OUTPUT)
 	docker volume create $(BUILD_IMAGE)-node $(VERBOSE_OUTPUT)
 	docker run $(DOCKER_RUN_FLAGS)                   \
-	    -v $(BUILD_IMAGE)-data:/data                 \
-	    -v $(BUILD_IMAGE)-node:/data/go/src/$(PKG)/client/node_modules       \
-	    -v $$(pwd)/build:/build                      \
+	    -v $(BUILD_IMAGE)-data:/data$(DOCKER_MOUNT_OPTION) \
+	    -v $(BUILD_IMAGE)-node:/data/go/src/$(PKG)/client/node_modules$(DOCKER_MOUNT_OPTION) \
+	    -v $$(pwd)/build:/build$(DOCKER_MOUNT_OPTION) \
 	    -e TARGET_UIDGID=$$(id -u):$$(id -g)         \
 	    $(BUILD_IMAGE)                               \
 	    /build/init_data.sh                          \
@@ -122,11 +122,11 @@ $(GO_BINARIES): build/build.sh $(BUILD_IMAGE_BUILDSTAMP)
 	    -e PKG=$(PKG)                                                        \
 	    -e VERSION=$(VERSION_BASE)-$(FAKEVER)                                \
 	    -u $$$$(id -u):$$$$(id -g)                                           \
-	    -v $(BUILD_IMAGE)-data:/data                                         \
-	    -v $(BUILD_IMAGE)-node:/data/go/src/$(PKG)/client/node_modules       \
-	    -v $$$$(pwd):/data/go/src/$(PKG)                                     \
-	    -v $$$$(pwd)/bin/$(FAKEVER)/$(ARCH):/data/go/bin                     \
-	    -v $$$$(pwd)/bin/$(FAKEVER)/$(ARCH):/data/go/bin/linux_$(ARCH)       \
+	    -v $(BUILD_IMAGE)-data:/data$(DOCKER_MOUNT_OPTION)                   \
+	    -v $(BUILD_IMAGE)-node:/data/go/src/$(PKG)/client/node_modules$(DOCKER_MOUNT_OPTION) \
+	    -v $$$$(pwd):/data/go/src/$(PKG)$(DOCKER_MOUNT_OPTION)               \
+	    -v $$$$(pwd)/bin/$(FAKEVER)/$(ARCH):/data/go/bin$(DOCKER_MOUNT_OPTION) \
+	    -v $$$$(pwd)/bin/$(FAKEVER)/$(ARCH):/data/go/bin/linux_$(ARCH)$(DOCKER_MOUNT_OPTION) \
 	    -w /data/go/src/$(PKG)                                               \
 	    $(BUILD_IMAGE)                                                       \
 	    ./build/build.sh $(VERBOSE_OUTPUT)
@@ -207,10 +207,10 @@ test: $(BUILD_IMAGE_BUILDSTAMP)
 	    $(DOCKER_RUN_FLAGS)                                                \
 	    --sig-proxy=true                                                   \
 	    -u $$(id -u):$$(id -g)                                             \
-			-v $(BUILD_IMAGE)-data:/data                                       \
-	    -v $(BUILD_IMAGE)-node:/data/go/src/$(PKG)/client/node_modules     \
-	    -v $$(pwd):/data/go/src/$(PKG)                                     \
-	    -v $$(pwd)/bin/$(ARCH):/data/go/bin                                \
+			-v $(BUILD_IMAGE)-data:/data$(DOCKER_MOUNT_OPTION)                 \
+	    -v $(BUILD_IMAGE)-node:/data/go/src/$(PKG)/client/node_modules$(DOCKER_MOUNT_OPTION) \
+	    -v $$(pwd):/data/go/src/$(PKG)$(DOCKER_MOUNT_OPTION)               \
+	    -v $$(pwd)/bin/$(ARCH):/data/go/bin$(DOCKER_MOUNT_OPTION)          \
 	    -w /data/go/src/$(PKG)                                             \
 	    $(BUILD_IMAGE)                                                     \
 	    /bin/sh -c "                                                       \
