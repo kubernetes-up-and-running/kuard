@@ -57,7 +57,10 @@ var config = {
       {
         test: /\.jsx?/,
         include: APP_DIR,
-        loader: 'babel'
+        loader: 'babel',
+        query: {
+          cacheDirectory: true
+        }
       },
       {
         test: /\.css$/,
@@ -80,7 +83,8 @@ var config = {
 };
 
 if (isProd) {
-  config.devtool = "#cheap-module-source-map"
+  config.devtool = "#source-map"
+  config.stats = {timings: true}
 }
 
 module.exports = config;
