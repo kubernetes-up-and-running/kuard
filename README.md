@@ -28,7 +28,7 @@ make push REGISTRY=<my-gcr-registry>
 
 For those following along with the book, you can build a binary to include in a docker image with a simple `make build`.  This will drop a `kuard` binary into `bin/1/amd64`.
 
-You can then build a docker image with the following Dockerfile:
+You can then build a docker image with the following `Dockerfile` in the root directory:
 
 ```
 FROM alpine
@@ -36,7 +36,9 @@ COPY bin/1/amd64/kuard /kuard
 ENTRYPOINT ["/kuard"]
 ```
 
-Then build with docker with something like `docker build -t kuard-amd64:1 .`
+Then build with docker with something like `docker build -t kuard-amd64:1 .`. Run with `docker run --rm -ti --name kuard --publish 8080:8080 kuard-amd64:1`.
+
+To upload to a registry you'll have to tag it and push to your registry.  Refer to your registry documentation for details.
 
 ### KeyGen Workload
 
