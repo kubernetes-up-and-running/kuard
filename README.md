@@ -13,11 +13,30 @@ Open your browser to [http://localhost:8080](http://localhost:8080).
 
 ### Building
 
-Have Docker installed.
+#### Automated container build and push
+
+This will build and push container images to a registry.
+It uses gcloud to push to GCR by default.  You can edit `rules.mk` to change this.
+
+This builds a set of images with "fake versions" to be able to play with upgrades.
 
 ```
 make push REGISTRY=<my-gcr-registry>
 ```
+
+#### Manual docker build
+
+For those following along with the book, you can build a binary to include in a docker image with a simple `make build`.  This will drop a `kuard` binary into `bin/1/amd64`.
+
+You can then build a docker image with the following Dockerfile:
+
+```
+FROM alpine
+COPY bin/1/amd64/kuard /kuard
+ENTRYPOINT ["/kuard"]
+```
+
+Then build with docker with something like `docker build -t kuard-amd64:1 .`
 
 ### KeyGen Workload
 
