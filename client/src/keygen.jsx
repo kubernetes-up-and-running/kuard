@@ -43,7 +43,7 @@ const uiSchema = {
   }
 }
 
-class KeyGen extends React.Component {
+export default class KeyGen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -157,6 +157,3 @@ KeyGen.propTypes =  {
 KeyGen.contextTypes = {
   reportConnError: React.PropTypes.func
 };
-
-
-module.exports = KeyGen;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-class Request extends React.Component {
+export default class Request extends React.Component {
   render () {
     return (
       <div>
@@ -14,5 +14,3 @@ class Request extends React.Component {
     )
   }
 }
-
-module.exports = Request;

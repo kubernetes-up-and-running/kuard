@@ -4,15 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server",
-    "dev": "webpack -d --watch",
-    "build": "NODE_ENV=production webpack"
+    "start": "webpack-dev-server --mode development",
+    "dev": "webpack -d --watch --mode development",
+    "build": "webpack --mode=production"
   },
   "author": "",
   "private": true,
   "dependencies": {
-    "classnames": "^2.2.5",
-    "marked": "^0.3.12",
+    "classnames": "^2.2.6",
+    "marked": "^0.3.19",
     "numeral": "^2.0.6",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
@@ -20,17 +20,13 @@
     "react-router-component": "^0.36.4"
   },
   "devDependencies": {
-    "babel-core": "^6.22.1",
-    "babel-loader": "^6.2.10",
-    "babel-preset-es2015": "^6.22.0",
-    "babel-preset-react": "^6.22.0",
-    "webpack": "^1.14.0",
-    "webpack-dev-server": "^1.16.2"
-  },
-  "babel": {
-    "presets": [
-      "es2015",
-      "react"
-    ]
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
+    "react-hot-loader": "^4.3.11",
+    "webpack": "^4.0.0",
+    "webpack-cli": "^3.2.1",
+    "webpack-dev-server": "^3.1.14"
   }
 }

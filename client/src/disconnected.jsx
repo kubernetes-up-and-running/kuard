@@ -1,6 +1,6 @@
 import React from 'react';
 
-class Disconnected extends React.Component {
+export default class Disconnected extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -37,5 +37,3 @@ class Disconnected extends React.Component {
     )
   }
 }
-
-module.exports = Disconnected;

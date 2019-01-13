@@ -21,4 +21,4 @@ let HighlightLink = React.createClass({
     }
 });
 
-module.exports = HighlightLink;
+export default HighlightLink;

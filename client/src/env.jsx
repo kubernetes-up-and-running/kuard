@@ -1,6 +1,6 @@
 import React from 'react';
 
-class Env extends React.Component {
+export default class Env extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -61,5 +61,3 @@ class Env extends React.Component {
 Env.propTypes =  {
   apiPath: React.PropTypes.string.isRequired,
 }
-
-module.exports = Env;

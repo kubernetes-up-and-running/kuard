@@ -18,7 +18,7 @@ See \`pkg/memq/types.go\` for the data structures returned.
 | \`POST\` | \`/queue/:queue/dequeue\` | Grab an item off the queue and return it. Returns a 204 "No Content" if queue is empty.
 `
 
-class MemQ extends React.Component {
+export default class MemQ extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -106,5 +106,3 @@ MemQ.propTypes =  {
 MemQ.contextTypes = {
   reportConnError: React.PropTypes.func
 };
-
-module.exports = MemQ;

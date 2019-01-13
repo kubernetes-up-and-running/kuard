@@ -1,7 +1,7 @@
 import React from 'react';
 import fetchError from './fetcherror';
 
-class Probe extends React.Component {
+export default class Probe extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -110,4 +110,3 @@ Probe.contextTypes = {
   reportConnError: React.PropTypes.func
 };
 
-module.exports = Probe;

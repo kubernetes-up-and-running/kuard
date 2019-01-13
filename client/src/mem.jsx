@@ -2,8 +2,7 @@ import React from 'react';
 import numeral from 'numeral';
 import fetchError from './fetcherror';
 
-
-class Mem extends React.Component {
+export default class Mem extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -101,5 +100,3 @@ Mem.propTypes =  {
 Mem.contextTypes = {
   reportConnError: React.PropTypes.func
 };
-
-module.exports = Mem;

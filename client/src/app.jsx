@@ -15,7 +15,7 @@ function createElement(Component, props) {
   return <Component {...props}/>
 }
 
-class App extends React.Component {
+export default class App extends React.Component {
   getChildContext() {
     return {
       reportConnError: () => {
@@ -88,4 +88,3 @@ App.childContextTypes = {
   reportConnError: React.PropTypes.func
 }
 
-module.exports = App;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-class Dns extends React.Component {
+export default class Dns extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -90,5 +90,3 @@ class Dns extends React.Component {
 Dns.propTypes =  {
   serverPath: React.PropTypes.string.isRequired,
 }
-
-module.exports = Dns;
