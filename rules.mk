@@ -180,9 +180,9 @@ push: $(PUSH_BUILDSTAMPS)
 
 .%-push: .%-container
 	@echo "pushing  :" $$(sed -n '1p' $<)
-	gcloud docker -- push $$(sed -n '1p' $<) $(VERBOSE_OUTPUT)
+	docker push $$(sed -n '1p' $<) $(VERBOSE_OUTPUT)
 	@echo "pushing  :" $$(sed -n '2p' $<)
-	gcloud docker -- push $$(sed -n '2p' $<) $(VERBOSE_OUTPUT)
+	docker push $$(sed -n '2p' $<) $(VERBOSE_OUTPUT)
 	cat $< > $@
 
 define PUSH_RULE
