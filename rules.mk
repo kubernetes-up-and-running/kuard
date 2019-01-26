@@ -114,6 +114,7 @@ define GO_BINARIES_RULE
 .PHONY: $(GO_BINARIES)
 $(GO_BINARIES): build/build.sh $(BUILD_IMAGE_BUILDSTAMP)
 	@echo "building : $$@"
+	@mkdir -p $(shell pwd)/bin/$(FAKEVER)/$(ARCH)
 	docker run                                                               \
 	    $(DOCKER_RUN_FLAGS)                                                  \
 	    --sig-proxy=true                                                     \
