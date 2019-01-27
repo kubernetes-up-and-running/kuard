@@ -21,22 +21,22 @@ It uses gcloud to push to GCR by default.  You can edit `rules.mk` to change thi
 This builds a set of images with "fake versions" to be able to play with upgrades.
 
 ```
-make push REGISTRY=<my-gcr-registry>
+make all-push REGISTRY=<my-gcr-registry>
 ```
 
 #### Manual docker build
 
-For those following along with the book, you can build a binary to include in a docker image with a simple `make build`.  This will drop a `kuard` binary into `bin/1/amd64`.
+For those following along with the book, you can build a binary to include in a docker image with a simple `make build`.  This will drop a `kuard` binary into `bin/blue/amd64`.
 
 You can then build a docker image with the following `Dockerfile` in the root directory:
 
 ```
 FROM alpine
-COPY bin/1/amd64/kuard /kuard
+COPY bin/blue/amd64/kuard /kuard
 ENTRYPOINT ["/kuard"]
 ```
 
-Then build with docker with something like `docker build -t kuard-amd64:1 .`. Run with `docker run --rm -ti --name kuard --publish 8080:8080 kuard-amd64:1`.
+Then build with docker with something like `docker build -t kuard-amd64:blue .`. Run with `docker run --rm -ti --name kuard --publish 8080:8080 kuard-amd64:blue`.
 
 To upload to a registry you'll have to tag it and push to your registry.  Refer to your registry documentation for details.
 
@@ -73,20 +73,20 @@ The API is as follows with URLs being relative to `<server addr>/memq/server`.  
 
 Images built will automatically have the git verison (based on tag) applied.  In addition, there is an idea of a "fake version".  This is used so that we can use the same basic server to demonstrate upgrade scenarios.
 
-Right now we create 3 fake versions: `1`, `2`, and `3`.  This translates into the following container images:
+Originally (and in the Kubernetes Up & Running book) we had `1`, `2`, and `3`.  This confused people so going forward we will be using colors instead: `blue`, `green` and `purple`. This translates into the following container images:
 
 ```
-gcr.io/kuar-demo/kuard-amd64:v0.4-1
-gcr.io/kuar-demo/kuard-amd64:1
-gcr.io/kuar-demo/kuard-amd64:v0.4-2
-gcr.io/kuar-demo/kuard-amd64:2
-gcr.io/kuar-demo/kuard-amd64:v0.4-3
-gcr.io/kuar-demo/kuard-amd64:3
+gcr.io/kuar-demo/kuard-amd64:v0.9-blue
+gcr.io/kuar-demo/kuard-amd64:blue
+gcr.io/kuar-demo/kuard-amd64:v0.9-green
+gcr.io/kuar-demo/kuard-amd64:green
+gcr.io/kuar-demo/kuard-amd64:v0.4-purple
+gcr.io/kuar-demo/kuard-amd64:purple
 ```
 
-For documentation where you want to demonstrate using versions but use the latest version of this server, you can simply reference `gcr.io/kuar-demo/kuard-amd64:1`.  You can then demonstrate an upgrade with `gcr.io/kuar-demo/kuard-amd64:2`.
+For documentation where you want to demonstrate using versions but use the latest version of this server, you can simply reference `gcr.io/kuar-demo/kuard-amd64:blue`.  You can then demonstrate an upgrade with `gcr.io/kuar-demo/kuard-amd64:green`.
 
-(Another way to think about it is that `:1` is essentially `:latest-1`)
+(Another way to think about it is that `:blue` is essentially `:latest-blue`)
 
 We also build versions for `arm`, `arm64`, and `ppc64le`.  Just substitute the appropriate architecture in the image name.  These aren't as well tested as the `amd64` version but seem to work okay.
 
@@ -112,17 +112,6 @@ If you want to do both Go server and React.js client dev, you need to do the fol
 4. Open your browser to http://localhost:8081.
 
 This should support live reload of any changes to the client.  The Go server will need to be exited and restarted to see changes.
-
-### Makefiles
-
-Go building makefiles taken from
-https://github.com/thockin/go-build-template with an Apache 2.0 license.
-Handling multiple targets taken from https://github.com/bowei/go-build-template.
-
-These have been heavily modified.
-* Support explicit docker volume for caching vs. using host mounts (as they are really slow on macOS)
-* Building/caching node
-* Fake versions so we can play with upgrades of this server
 
 ### TODO
 * [ ] Make file system browser better.  Show size, permissions, etc.  Might be able to do this by faking out an `index.html` as part of the http.FileSystem stuff.
