@@ -59,6 +59,8 @@ This builds a set of images with "fake versions" (see below) to be able to play 
 make all-push REGISTRY=<my-gcr-registry>
 ```
 
+If you are having trouble, try issuing a `make clean` to reset stuff.
+
 ### KeyGen Workload
 
 To help simulate batch workers, we have a synthetic workload of generating 4096 bit RSA keys.  This can be configured through the UI or the command line.
