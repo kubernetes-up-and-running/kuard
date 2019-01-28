@@ -5,7 +5,7 @@
 ### Running
 
 ```
-kubectl run --restart=Never --image=gcr.io/kuar-demo/kuard-amd64:1 kuard
+kubectl run --restart=Never --image=gcr.io/kuar-demo/kuard-amd64:blue kuard
 kubectl port-forward kuard 8080:8080
 ```
 
@@ -13,32 +13,51 @@ Open your browser to [http://localhost:8080](http://localhost:8080).
 
 ### Building
 
-#### Automated container build and push
+We have ~3 ways to build.
+This has changed slightly from when the book is published so I'd view this as authoritative.
 
-This will build and push container images to a registry.
-It uses gcloud to push to GCR by default.  You can edit `rules.mk` to change this.
+#### Insert Binary
 
-This builds a set of images with "fake versions" to be able to play with upgrades.
+This aligns with what is in the book.
+You need to build the binary to run *somehow* and then insert it into a Docker image.
+The easiest way to do this is to use the fully automated make system to build the binary and then create a Dockerfile for creating an image.
 
-```
-make all-push REGISTRY=<my-gcr-registry>
-```
+Create the binary by typing `make` at the command line. This'll build a docker image and then run it to compile the binary.
 
-#### Manual docker build
-
-For those following along with the book, you can build a binary to include in a docker image with a simple `make build`.  This will drop a `kuard` binary into `bin/blue/amd64`.
-
-You can then build a docker image with the following `Dockerfile` in the root directory:
+Now create a minimal Dockerfile to contain that binary:
 
 ```
 FROM alpine
 COPY bin/blue/amd64/kuard /kuard
-ENTRYPOINT ["/kuard"]
+ENTRYPOINT [ "/kuard" ]
 ```
 
-Then build with docker with something like `docker build -t kuard-amd64:blue .`. Run with `docker run --rm -ti --name kuard --publish 8080:8080 kuard-amd64:blue`.
+Overwrite `Dockerfile` with this and then run `docker build -t kuard-amd64:blue .`.
+Run with `docker run --rm -ti --name kuard --publish 8080:8080 kuard-amd64:blue`.
 
 To upload to a registry you'll have to tag it and push to your registry.  Refer to your registry documentation for details.
+
+#### Multi-stage Dockerfile
+
+A new feature of Docker, since the book was published, is a "multi-stage" build.
+This is a way to run build multiple images and then copy files between them.
+
+The `Dockerfile` at the root of this repo is an example of that.
+It creates one image to build kuard and then another image for running kuard.
+
+You can easily build an image with `docker build -t kuard-amd64:blue .`.
+Run with `docker run --rm -ti --name kuard --publish 8080:8080 kuard-amd64:blue`.
+
+To upload to a registry you'll have to tag it and push to your registry.  Refer to your registry documentation for details.
+
+#### Fancy Makefile for automated build and push
+
+This will build and push container images to a registry.
+This builds a set of images with "fake versions" (see below) to be able to play with upgrades.
+
+```
+make all-push REGISTRY=<my-gcr-registry>
+```
 
 ### KeyGen Workload
 
@@ -116,3 +135,4 @@ This should support live reload of any changes to the client.  The Go server wil
 ### TODO
 * [ ] Make file system browser better.  Show size, permissions, etc.  Might be able to do this by faking out an `index.html` as part of the http.FileSystem stuff.
 * [ ] Clean up form for keygen workload.  It is too big and the form build doesn't have enough flexibility to really shrink it down.
+* [ ] Get rid of go-bindata as it is abandoned.
