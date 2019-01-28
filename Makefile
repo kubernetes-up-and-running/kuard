@@ -149,6 +149,7 @@ build: $(BINARYPATH)
 
 $(BINARYPATH): build/build.sh $(BUILD_IMAGE_BUILDSTAMP)
 	@echo "building binary: $@"
+	@mkdir -p $(shell pwd)/bin/$(FAKEVER)/$(ARCH)
 	docker run                                                               \
 			$(DOCKER_RUN_FLAGS)                                                  \
 			$(DOCKER_MOUNTS)                                                     \
