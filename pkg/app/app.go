@@ -32,7 +32,7 @@ import (
 	"github.com/kubernetes-up-and-running/kuard/pkg/htmlutils"
 	"github.com/kubernetes-up-and-running/kuard/pkg/keygen"
 	"github.com/kubernetes-up-and-running/kuard/pkg/memory"
-	"github.com/kubernetes-up-and-running/kuard/pkg/memq/server"
+	memqserver "github.com/kubernetes-up-and-running/kuard/pkg/memq/server"
 	"github.com/kubernetes-up-and-running/kuard/pkg/sitedata"
 	"github.com/kubernetes-up-and-running/kuard/pkg/version"
 
