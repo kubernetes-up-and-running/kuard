@@ -5,7 +5,7 @@ import Markdown from './markdown'
 const apiMD = ` This shows the status of a simple in memory queue.  This is
 based heavily on https://github.com/kelseyhightower/memq.
 
-The API is as follows with URLs being relative to \`<server addr>/memq/server\`.
+The API is as follows with URLs being relative to \`<server addr>/<api-base>/memq/server\`.
 See \`pkg/memq/types.go\` for the data structures returned.
 
 | Method | Url | Desc

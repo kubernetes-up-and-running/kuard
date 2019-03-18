@@ -101,7 +101,7 @@ gcr.io/kuar-demo/kuard-amd64:v0.9-blue
 gcr.io/kuar-demo/kuard-amd64:blue
 gcr.io/kuar-demo/kuard-amd64:v0.9-green
 gcr.io/kuar-demo/kuard-amd64:green
-gcr.io/kuar-demo/kuard-amd64:v0.4-purple
+gcr.io/kuar-demo/kuard-amd64:v0.9-purple
 gcr.io/kuar-demo/kuard-amd64:purple
 ```
 
@@ -122,7 +122,7 @@ If you want to do both Go server and React.js client dev, you need to do the fol
 
   * `cd client`
   * `npm install`
-  * `npm start`
+  * `npm run start`
   * This will start a debug node server on `localhost:8081`.  It'll proxy all unhandled requests to `localhost:8080`
 
 3. In another terminal

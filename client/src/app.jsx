@@ -41,6 +41,8 @@ export default class App extends React.Component {
       addrs.push(<span key={a}>{a}</span>, " ")
     }
 
+    let base = this.props.page.urlBase;
+
     return (
       <div className="top">
         <div className="title">
@@ -56,26 +58,26 @@ export default class App extends React.Component {
 
         <div className="nav-container">
           <div className="nav">
-            <HighlightLink href="/" className="nav-item">Request Details</HighlightLink>
-            <HighlightLink href="/-/env" className="nav-item">Server Env</HighlightLink>
-            <HighlightLink href="/-/mem" className="nav-item">Memory</HighlightLink>
-            <HighlightLink href="/-/liveness" className="nav-item">Liveness Probe</HighlightLink>
-            <HighlightLink href="/-/readiness" className="nav-item">Readiness Probe</HighlightLink>
-            <HighlightLink href="/-/dns" className="nav-item">DNS Query</HighlightLink>
-            <HighlightLink href="/-/keygen" className="nav-item">KeyGen Workload</HighlightLink>
-            <HighlightLink href="/-/memq" className="nav-item">MemQ Server</HighlightLink>
-            <a className="nav-item" href="/fs/">File system browser</a>
+            <HighlightLink href={base+"/"} className="nav-item">Request Details</HighlightLink>
+            <HighlightLink href={base+"/-/env"} className="nav-item">Server Env</HighlightLink>
+            <HighlightLink href={base+"/-/mem"} className="nav-item">Memory</HighlightLink>
+            <HighlightLink href={base+"/-/liveness"} className="nav-item">Liveness Probe</HighlightLink>
+            <HighlightLink href={base+"/-/readiness"} className="nav-item">Readiness Probe</HighlightLink>
+            <HighlightLink href={base+"/-/dns"} className="nav-item">DNS Query</HighlightLink>
+            <HighlightLink href={base+"/-/keygen"} className="nav-item">KeyGen Workload</HighlightLink>
+            <HighlightLink href={base+"/-/memq"} className="nav-item">MemQ Server</HighlightLink>
+            <a className="nav-item" href={base+"/fs/"}>File system browser</a>
           </div>
           <div className="content">
             <Locations onNavigation={this.handleNavigation.bind(this)}>
-              <Location path="/" handler={Request} page={this.props.page}/>
-              <Location path="/-/env" apiPath="/env/api" handler={Env}/>
-              <Location path="/-/mem" apiPath="/mem/api" handler={Mem}/>
-              <Location path="/-/liveness" serverPath="/healthy" handler={Probe}/>
-              <Location path="/-/readiness" serverPath="/ready" handler={Probe}/>
-              <Location path="/-/dns" serverPath="/dns" handler={Dns}/>
-              <Location path="/-/keygen" serverPath="/keygen" handler={KeyGen}/>
-              <Location path="/-/memq" serverPath="/memq" handler={MemQ}/>
+              <Location path={base+"/"} handler={Request} page={this.props.page}/>
+              <Location path={base+"/-/env"} apiPath={base+"/env/api"} handler={Env}/>
+              <Location path={base+"/-/mem"} apiPath={base+"/mem/api"} handler={Mem}/>
+              <Location path={base+"/-/liveness"} serverPath={base+"/healthy"} handler={Probe}/>
+              <Location path={base+"/-/readiness"} serverPath={base+"/ready"} handler={Probe}/>
+              <Location path={base+"/-/dns"} serverPath={base+"/dns"} handler={Dns}/>
+              <Location path={base+"/-/keygen"} serverPath={base+"/keygen"} handler={KeyGen}/>
+              <Location path={base+"/-/memq"} serverPath={base+"/memq"} handler={MemQ}/>
             </Locations>
           </div>
         </div>

@@ -6,7 +6,6 @@ RUN apk update && apk upgrade && apk add --no-cache git nodejs bash npm
 
 # Get dependencies for Go part of build
 RUN go get -u github.com/jteeuwen/go-bindata/...
-RUN go get github.com/tools/godep
 
 WORKDIR /go/src/github.com/kubernetes-up-and-running/kuard
 

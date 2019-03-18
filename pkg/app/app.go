@@ -66,6 +66,7 @@ func loggingMiddleware(handler http.Handler) http.Handler {
 }
 
 type pageContext struct {
+	URLBase      string       `json:"urlBase"`
 	Hostname     string       `json:"hostname"`
 	Addrs        []string     `json:"addrs"`
 	Version      string       `json:"version"`
@@ -90,8 +91,9 @@ type App struct {
 	r *httprouter.Router
 }
 
-func (k *App) getPageContext(r *http.Request) *pageContext {
+func (k *App) getPageContext(r *http.Request, urlBase string) *pageContext {
 	c := &pageContext{}
+	c.URLBase = urlBase
 	c.Hostname, _ = os.Hostname()
 
 	addrs, _ := net.InterfaceAddrs()
@@ -115,8 +117,10 @@ func (k *App) getPageContext(r *http.Request) *pageContext {
 	return c
 }
 
-func (k *App) rootHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	k.tg.Render(w, "index.html", k.getPageContext(r))
+func (k *App) getRootHandler(urlBase string) httprouter.Handle {
+	return httprouter.Handle(func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		k.tg.Render(w, "index.html", k.getPageContext(r, urlBase))
+	})
 }
 
 // Exists reports whether the named file or directory exists.
@@ -166,24 +170,27 @@ func NewApp() *App {
 	k.mq = memqserver.NewServer()
 
 	// Add handlers
-	router.GET("/", k.rootHandler)
-	router.GET("/-/*path", k.rootHandler)
+	for _, prefix := range []string{"", "/a", "/b", "/c"} {
+		rootHandler := k.getRootHandler(prefix)
+		router.GET(prefix+"/", rootHandler)
+		router.GET(prefix+"/-/*path", rootHandler)
 
-	router.Handler("GET", "/metrics", prometheus.Handler())
+		router.Handler("GET", prefix+"/metrics", prometheus.Handler())
 
-	// Add the static files
-	sitedata.AddRoutes(router, "/built")
-	sitedata.AddRoutes(router, "/static")
+		// Add the static files
+		sitedata.AddRoutes(router, prefix+"/built")
+		sitedata.AddRoutes(router, prefix+"/static")
 
-	router.Handler("GET", "/fs/*filepath", http.StripPrefix("/fs", http.FileServer(http.Dir("/"))))
+		router.Handler("GET", prefix+"/fs/*filepath", http.StripPrefix(prefix+"/fs", http.FileServer(http.Dir("/"))))
 
-	k.m.AddRoutes(router, "/mem")
-	k.live.AddRoutes(router, "/healthy")
-	k.ready.AddRoutes(router, "/ready")
-	k.env.AddRoutes(router, "/env")
-	k.dns.AddRoutes(router, "/dns")
-	k.kg.AddRoutes(router, "/keygen")
-	k.mq.AddRoutes(router, "/memq/server")
+		k.m.AddRoutes(router, prefix+"/mem")
+		k.live.AddRoutes(router, prefix+"/healthy")
+		k.ready.AddRoutes(router, prefix+"/ready")
+		k.env.AddRoutes(router, prefix+"/env")
+		k.dns.AddRoutes(router, prefix+"/dns")
+		k.kg.AddRoutes(router, prefix+"/keygen")
+		k.mq.AddRoutes(router, prefix+"/memq/server")
+	}
 
 	return k
 }
