@@ -80,9 +80,12 @@ type App struct {
 	tg *htmlutils.TemplateGroup
 
 	m     *memory.MemoryAPI
-	kg    *keygen.KeyGen
 	live  *debugprobe.Probe
 	ready *debugprobe.Probe
+	env   *env.Env
+	dns   *dnsapi.DNSAPI
+	kg    *keygen.KeyGen
+	mq    *memqserver.Server
 
 	r *httprouter.Router
 }
@@ -151,9 +154,18 @@ func NewApp() *App {
 		r:  httprouter.New(),
 	}
 
-	router := k.r
+	// Init all of the subcomponents
 
-	// Add the root handler
+	router := k.r
+	k.m = memory.New()
+	k.live = debugprobe.New()
+	k.ready = debugprobe.New()
+	k.env = env.New()
+	k.dns = dnsapi.New()
+	k.kg = keygen.New()
+	k.mq = memqserver.NewServer()
+
+	// Add handlers
 	router.GET("/", k.rootHandler)
 	router.GET("/-/*path", k.rootHandler)
 
@@ -165,19 +177,13 @@ func NewApp() *App {
 
 	router.Handler("GET", "/fs/*filepath", http.StripPrefix("/fs", http.FileServer(http.Dir("/"))))
 
-	k.m = memory.New("/mem")
-	k.m.AddRoutes(router)
-	k.live = debugprobe.New("/healthy")
-	k.live.AddRoutes(router)
-	k.ready = debugprobe.New("/ready")
-	k.ready.AddRoutes(router)
-	env.New("/env").AddRoutes(router)
-	dnsapi.New("/dns").AddRoutes(router)
-
-	k.kg = keygen.New("/keygen")
-	k.kg.AddRoutes(router)
-
-	memqserver.NewServer("/memq/server").AddRoutes(router)
+	k.m.AddRoutes(router, "/mem")
+	k.live.AddRoutes(router, "/healthy")
+	k.ready.AddRoutes(router, "/ready")
+	k.env.AddRoutes(router, "/env")
+	k.dns.AddRoutes(router, "/dns")
+	k.kg.AddRoutes(router, "/keygen")
+	k.mq.AddRoutes(router, "/memq/server")
 
 	return k
 }

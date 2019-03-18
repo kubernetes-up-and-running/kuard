@@ -33,7 +33,6 @@ const maxHistory = 20
 
 type KeyGen struct {
 	mu             sync.Mutex
-	path           string
 	config         Config
 	history        []History
 	nextHistoryID  int
@@ -41,17 +40,16 @@ type KeyGen struct {
 	cancelFunc     context.CancelFunc
 }
 
-func New(path string) *KeyGen {
+func New() *KeyGen {
 	kg := &KeyGen{
-		path:    path,
 		history: []History{},
 	}
 	return kg
 }
 
-func (kg *KeyGen) AddRoutes(router *httprouter.Router) {
-	router.GET(kg.path, kg.APIGet)
-	router.PUT(kg.path, kg.APIPut)
+func (kg *KeyGen) AddRoutes(router *httprouter.Router, base string) {
+	router.GET(base, kg.APIGet)
+	router.PUT(base, kg.APIPut)
 }
 
 func (kg *KeyGen) Restart() {

@@ -27,8 +27,7 @@ import (
 )
 
 type MemoryAPI struct {
-	basePath string
-	leaks    [][]byte
+	leaks [][]byte
 }
 
 // MemoryStatus is returned from a GET to this API endpoing
@@ -36,16 +35,14 @@ type MemoryStatus struct {
 	MemStats runtime.MemStats `json:"memStats"`
 }
 
-func New(base string) *MemoryAPI {
-	return &MemoryAPI{
-		basePath: base,
-	}
+func New() *MemoryAPI {
+	return &MemoryAPI{}
 }
 
-func (e *MemoryAPI) AddRoutes(r *httprouter.Router) {
-	r.GET(e.basePath+"/api", e.APIGet)
-	r.POST(e.basePath+"/api/alloc", e.APIAlloc)
-	r.POST(e.basePath+"/api/clear", e.APIClear)
+func (e *MemoryAPI) AddRoutes(r *httprouter.Router, base string) {
+	r.GET(base+"/api", e.APIGet)
+	r.POST(base+"/api/alloc", e.APIAlloc)
+	r.POST(base+"/api/clear", e.APIClear)
 }
 
 func (e *MemoryAPI) APIGet(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {

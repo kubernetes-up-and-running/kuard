@@ -23,9 +23,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/julienschmidt/httprouter"
 	"github.com/kubernetes-up-and-running/kuard/pkg/apiutils"
 	"github.com/kubernetes-up-and-running/kuard/pkg/htmlutils"
-	"github.com/julienschmidt/httprouter"
 )
 
 const maxHistory = 20
@@ -46,16 +46,18 @@ type ProbeHistory struct {
 	Code int
 }
 
-func New(base string) *Probe {
-	return &Probe{
-		basePath: base,
-	}
+func New() *Probe {
+	return &Probe{}
 }
 
-func (p *Probe) AddRoutes(r *httprouter.Router) {
-	r.GET(p.basePath, p.Handle)
-	r.GET(p.basePath+"/api", p.APIGet)
-	r.PUT(p.basePath+"/api", p.APIPut)
+func (p *Probe) AddRoutes(r *httprouter.Router, base string) {
+	r.GET(base, p.Handle)
+	r.GET(base+"/api", p.APIGet)
+	r.PUT(base+"/api", p.APIPut)
+
+	if p.basePath != "" {
+		p.basePath = base
+	}
 }
 
 func (p *Probe) APIGet(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

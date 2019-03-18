@@ -22,13 +22,12 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kubernetes-up-and-running/kuard/pkg/apiutils"
 	"github.com/julienschmidt/httprouter"
+	"github.com/kubernetes-up-and-running/kuard/pkg/apiutils"
 	"github.com/miekg/dns"
 )
 
 type DNSAPI struct {
-	basePath string
 }
 
 // DNSResponse is returned from a GET to this API endpoing
@@ -41,14 +40,12 @@ type DNSRequest struct {
 	Name string `json:"name"`
 }
 
-func New(base string) *DNSAPI {
-	return &DNSAPI{
-		basePath: base,
-	}
+func New() *DNSAPI {
+	return &DNSAPI{}
 }
 
-func (e *DNSAPI) AddRoutes(r *httprouter.Router) {
-	r.POST(e.basePath+"/api", e.APIGet)
+func (e *DNSAPI) AddRoutes(r *httprouter.Router, base string) {
+	r.POST(base+"/api", e.APIGet)
 }
 
 func (e *DNSAPI) APIGet(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

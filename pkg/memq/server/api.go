@@ -20,29 +20,27 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/kubernetes-up-and-running/kuard/pkg/apiutils"
 	"github.com/julienschmidt/httprouter"
+	"github.com/kubernetes-up-and-running/kuard/pkg/apiutils"
 )
 
 type Server struct {
-	path   string
 	broker *Broker
 }
 
-func NewServer(path string) *Server {
+func NewServer() *Server {
 	return &Server{
-		path:   path,
 		broker: NewBroker(),
 	}
 }
 
-func (s *Server) AddRoutes(router *httprouter.Router) {
-	router.GET(s.path+"/stats", s.GetStats)
-	router.PUT(s.path+"/queues/:queue", s.CreateQueue)
-	router.DELETE(s.path+"/queues/:queue", s.DeleteQueue)
-	router.POST(s.path+"/queues/:queue/drain", s.DrainQueue)
-	router.POST(s.path+"/queues/:queue/dequeue", s.Dequeue)
-	router.POST(s.path+"/queues/:queue/enqueue", s.Enqueue)
+func (s *Server) AddRoutes(router *httprouter.Router, base string) {
+	router.GET(base+"/stats", s.GetStats)
+	router.PUT(base+"/queues/:queue", s.CreateQueue)
+	router.DELETE(base+"/queues/:queue", s.DeleteQueue)
+	router.POST(base+"/queues/:queue/drain", s.DrainQueue)
+	router.POST(base+"/queues/:queue/dequeue", s.Dequeue)
+	router.POST(base+"/queues/:queue/enqueue", s.Enqueue)
 }
 
 func (s *Server) CreateQueue(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
