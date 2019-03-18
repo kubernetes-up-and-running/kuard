@@ -41,6 +41,7 @@ fi
 
 export CGO_ENABLED=0
 export GOARCH="${ARCH}"
+export GO111MODULE=on
 
 (
   cd client

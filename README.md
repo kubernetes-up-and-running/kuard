@@ -129,7 +129,7 @@ If you want to do both Go server and React.js client dev, you need to do the fol
   * Ensure that $GOPATH is set to the directory with your go source code and binaries + ensure that $GOPATH is part of $PATH.
   * `go get -u github.com/jteeuwen/go-bindata/...`
   * `go generate ./pkg/...`
-  * `go run cmd/kuard/*.go --debug`
+  * `GO111MODULE=on go run cmd/kuard/*.go --debug`
 4. Open your browser to http://localhost:8081.
 
 This should support live reload of any changes to the client.  The Go server will need to be exited and restarted to see changes.

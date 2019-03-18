@@ -1,5 +1,5 @@
 # STAGE 1: Build
-FROM golang:1.11-alpine AS build
+FROM golang:1.12-alpine AS build
 
 # Install Node and NPM.
 RUN apk update && apk upgrade && apk add --no-cache git nodejs bash npm
