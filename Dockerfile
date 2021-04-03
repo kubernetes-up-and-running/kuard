@@ -18,6 +18,9 @@ ENV PKG=github.com/kubernetes-up-and-running/kuard
 ENV ARCH=amd64
 ENV VERSION=test
 
+# When running on Windows 10, you need to clean up the ^Ms in the script
+RUN dos2unix build/build.sh
+
 # Do the build. Script is part of incoming sources.
 RUN build/build.sh
 
