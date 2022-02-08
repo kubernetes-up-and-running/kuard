@@ -19,6 +19,7 @@ package dnsapi
 import (
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 
@@ -99,11 +100,17 @@ func dnsQuery(t string, name string) (string, error) {
 		names = append(names, name)
 	}
 
+	server := config.Servers[0]
+	serverIP := net.ParseIP(server)
+	if serverIP.To4() == nil {
+		server = "[" + server + "]"
+	}
+
 	var r *dns.Msg
 	for _, name := range names {
 		m.SetQuestion(dns.Fqdn(name), qtype)
 		m.RecursionDesired = true
-		r, _, err = c.Exchange(m, config.Servers[0]+":"+config.Port)
+		r, _, err = c.Exchange(m, server+":"+config.Port)
 		if err != nil {
 			return "", err
 		}
