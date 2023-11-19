@@ -6,7 +6,7 @@ spec:
   containers:
     - image: grc.io/kuar-demo/kuard-amd64:blue
       name: kuard
-      orts:
-      - containerPort: 8080
-        name: http
-        protocol: TCP
+      ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
