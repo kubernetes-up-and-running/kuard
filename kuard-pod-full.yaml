@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Pod
 metadata:
@@ -12,9 +13,9 @@ spec:
     - image: gcr.io/kuar-demo/kuard-amd64:blue
       name: kuard
       ports:
-      - containerPort: 8080
-        name: http
-        protocol: TCP
+        - containerPort: 8080
+          name: http
+          protocol: TCP
       resources:
         requests:
           cpu: "500m"
@@ -23,8 +24,8 @@ spec:
           cpu: "1000m"
           memory: "256Mi"
       volumeMounts:
-      - mountPath: "/data"
-        name: "kuard-data"
+        - mountPath: "/data"
+          name: "kuard-data"
       livenessProbe:
         httpGet:
           path: /healthy

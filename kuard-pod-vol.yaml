@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Pod
 metadata:
@@ -6,14 +7,14 @@ spec:
  volumes:
   - name: "kuard-data"
     hostPath:
-      path: "/var/lib/kuard"
+     path: "/var/lib/kuard"
  containers:
   - image: gcr.io/kuar-demo/kuard-amd64:blue
     name: kuard
     volumeMounts:
-      - mountPath: "/data"
-        name: "kuard-data"
+     - mountPath: "/data"
+       name: "kuard-data"
     ports:
-      - containerPort: 8080
-        name: http
-        protocol: TCP
+     - containerPort: 8080
+       name: http
+       protocol: TCP
