@@ -1,0 +1,27 @@
+---
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: path-ingress
+spec:
+  rules:
+    - host: bandicoot.example.com
+      http:
+        paths:
+          # all traffic starting with /a/ is forwarded to alpaca
+          # everything else starting with / is forwarded to bandicoot
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: bandicoot
+                port:
+                  number: 8080
+          - path: "/a/"
+            pathType: Prefix
+            backend:
+              service:
+                name: alpaca
+                port:
+                  number: 8080
