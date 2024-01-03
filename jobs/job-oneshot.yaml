@@ -1,0 +1,19 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: oneshot
+spec:
+  template:
+    metadata:
+      name: oneshot
+    spec:
+      containers:
+      - name: kuard
+        image: gcr.io/kuar-demo/kuard-amd64:blue
+        imagePullPolicy: Always
+        args:
+          - "--keygen-enable"
+          - "--keygen-exit-on-complete"
+          - "--keygen-num-to-gen=10"
+      restartPolicy: OnFailure
