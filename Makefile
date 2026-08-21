@@ -181,6 +181,7 @@ BUILDSTAMP_NAME := $(subst /,_,$(CONTAINER_NAME)-$(FAKEVER))
 	@echo "container image: $(CONTAINER_NAME):$(VERSION_BASE)-$(FAKEVER)"
 	docker build                                                    \
 		$(DOCKER_BUILD_FLAGS)                                         \
+		--platform linux/$(ARCH)                                     \
 		-t $(CONTAINER_NAME):$(VERSION_BASE)-$(FAKEVER)               \
 		-f .kuard-$(ARCH)-$(FAKEVER)-dockerfile .                     \
 		$(VERBOSE_OUTPUT)
