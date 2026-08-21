@@ -4,8 +4,12 @@
 
 ### Running
 
+Images are published to [GitHub Container Registry](https://ghcr.io)
+(`ghcr.io/kubernetes-up-and-running/kuard-*`). The original
+`gcr.io/kuar-demo` images are no longer maintained.
+
 ```
-kubectl run --restart=Never --image=gcr.io/kuar-demo/kuard-amd64:blue kuard
+kubectl run --restart=Never --image=ghcr.io/kubernetes-up-and-running/kuard-amd64:blue kuard
 kubectl port-forward kuard 8080:8080
 ```
 
@@ -56,10 +60,15 @@ This will build and push container images to a registry.
 This builds a set of images with "fake versions" (see below) to be able to play with upgrades.
 
 ```
-make all-push REGISTRY=<my-gcr-registry>
+make all-push REGISTRY=ghcr.io/<your-namespace>
 ```
 
 If you are having trouble, try issuing a `make clean` to reset stuff.
+
+Official releases are built and published automatically by
+[`.github/workflows/release.yml`](.github/workflows/release.yml) on every
+`v*` tag push, covering every architecture and fake version. Use the manual
+method above only when testing your own build.
 
 ### KeyGen Workload
 
@@ -97,15 +106,15 @@ Images built will automatically have the git version (based on tag) applied.  In
 Originally (and in the Kubernetes Up & Running book) we had `1`, `2`, and `3`.  This confused people so going forward we will be using colors instead: `blue`, `green` and `purple`. This translates into the following container images:
 
 ```
-gcr.io/kuar-demo/kuard-amd64:v0.9-blue
-gcr.io/kuar-demo/kuard-amd64:blue
-gcr.io/kuar-demo/kuard-amd64:v0.9-green
-gcr.io/kuar-demo/kuard-amd64:green
-gcr.io/kuar-demo/kuard-amd64:v0.9-purple
-gcr.io/kuar-demo/kuard-amd64:purple
+ghcr.io/kubernetes-up-and-running/kuard-amd64:v0.9-blue
+ghcr.io/kubernetes-up-and-running/kuard-amd64:blue
+ghcr.io/kubernetes-up-and-running/kuard-amd64:v0.9-green
+ghcr.io/kubernetes-up-and-running/kuard-amd64:green
+ghcr.io/kubernetes-up-and-running/kuard-amd64:v0.9-purple
+ghcr.io/kubernetes-up-and-running/kuard-amd64:purple
 ```
 
-For documentation where you want to demonstrate using versions but use the latest version of this server, you can simply reference `gcr.io/kuar-demo/kuard-amd64:blue`.  You can then demonstrate an upgrade with `gcr.io/kuar-demo/kuard-amd64:green`.
+For documentation where you want to demonstrate using versions but use the latest version of this server, you can simply reference `ghcr.io/kubernetes-up-and-running/kuard-amd64:blue`.  You can then demonstrate an upgrade with `ghcr.io/kubernetes-up-and-running/kuard-amd64:green`.
 
 (Another way to think about it is that `:blue` is essentially `:latest-blue`)
 
